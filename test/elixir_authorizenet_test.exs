@@ -6,7 +6,6 @@ defmodule AuthorizeNetTest do
   require Logger
 
   setup do
-    :timer.sleep 100
     :ok
   end
   test "can raise connection error on network issues" do
