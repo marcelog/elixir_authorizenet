@@ -1,7 +1,7 @@
 AuthorizeNet
 ============
 
-Elixir client for the Authorize.Net merchant API](http://developer.authorize.net/api/reference/index.html).
+Elixir client for the [Authorize.Net merchant API](http://developer.authorize.net/api/reference/index.html).
 This is WIP.
 
 ## Errors
