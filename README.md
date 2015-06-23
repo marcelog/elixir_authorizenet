@@ -18,6 +18,18 @@ This is WIP.
  :ok
 ```
 
+### Get all IDs
+```elixir
+  > AuthorizeNet.Customer.get_all
+  [35926385]
+```
+
+### Get Customer Profile
+```elixir
+  > AuthorizeNet.Customer.get 35926385
+  [description: "description", email: "email2@host.com", merchantCustomerId: "merchantId"]
+```
+
 ### Deleting
 ```elixir
   > AuthorizeNet.Customer.delete 35926385
