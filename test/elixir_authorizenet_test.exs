@@ -150,7 +150,7 @@ defmodule AuthorizeNetTest do
     start_server fn(_bindings, _headers, body, req, state) ->
       msgs = []
       msgs = case validate body do
-        {:error, _error} -> ["invalid schema"|msgs]
+        {:error, error} -> ["invalid schema: #{inspect error}"|msgs]
         :ok -> msgs
       end
       msgs = if xml_find(body, "//#{request_type}") === [] do
