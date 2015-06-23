@@ -6,7 +6,7 @@ This is WIP.
 
 ## Errors
 
-These errors are might be raised by the API calls:
+These errors might be raised by the API calls:
 
  * [AuthorizeNet.Error.Connection](https://github.com/marcelog/elixir_authorizenet/blob/master/lib/elixir_authorizenet/error/connection_error.ex): There was an error when trying to hit the API endpoint (like a network issue).
 
