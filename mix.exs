@@ -47,9 +47,8 @@ defmodule AuthorizeNet.Mixfile do
       {:ex_doc, "~> 0.7", only: :dev},
       {:coverex, "~> 1.2.0", only: :test},
       {:exmerl, "~> 0.1.1"},
-      {:exjsx, "~> 3.1.0"},
-      {:poison, "~> 1.4.0", override: true},
-      {:xml_builder, "~> 0.0.6"}
+      {:xml_builder, "~> 0.0.6"},
+      {:servito, github: "marcelog/servito", only: :test}
     ]
   end
 end

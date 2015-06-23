@@ -1,6 +1,16 @@
 defmodule AuthorizeNet.Helper.Http do
   require Logger
 
+  @typep header :: {char_list, char_list}
+  @typep headers :: [header]
+  @typep status_code :: Integer
+  @typep method :: :get | :post | :delete | :put | :head | :options
+  @typep uri :: String.t
+  @typep body :: Keyword.t
+  @typep query_string :: Map
+
+  @spec req(method, uri, body, headers, query_string) ::
+    {:ok, status_code, headers, body} | {:error, term}
   def req(method, uri, body \\ [], headers \\ [], qs \\ %{}) do
     qs = URI.encode_query qs
     headers = [
@@ -15,7 +25,7 @@ defmodule AuthorizeNet.Helper.Http do
       {:connect_timeout, 60000}, {:inactivity_timeout, 60000},
       {:stream_chunk_size, 10}, {:ssl_options, [{:verify, :verify_none}]}
     ])
-    Logger.debug "Request: #{body}: #{inspect ret}"
+    Logger.debug "Request Result: #{inspect ret}"
     case ret do
       {:ok, status_code, retheaders, retbody} ->
         {status_code, _} = Integer.parse to_string(status_code)

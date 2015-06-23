@@ -9,6 +9,7 @@ defmodule AuthorizeNet do
   @uris sandbox: "https://apitest.authorize.net/xml/v1/request.api",
     production: "https://api.authorize.net/xml/v1/request.api"
 
+  @spec req(Atom, Keyword.t) :: Record | no_return
   def req(requestType, parameters) do
     body = [{requestType, [{:merchantAuthentication, auth}|parameters]}]
     case Http.req :post, uri, body do
@@ -23,11 +24,12 @@ defmodule AuthorizeNet do
         doc
       {:ok, status, headers, body} ->
         raise RequestError, message: {status, headers, body}
-      {:error, error} ->
+      error ->
         raise ConnectionError, message: error
     end
   end
 
+  @spec validation_mode() :: String.t
   def validation_mode() do
     case config :validation_mode do
       :live -> "liveMode"
@@ -49,7 +51,11 @@ defmodule AuthorizeNet do
   end
 
   defp uri() do
-    @uris[config(:environment)]
+    if Mix.env === :test do
+      config :test_server_uri
+    else
+      @uris[config(:environment)]
+    end
   end
 
   defp config(key) do
