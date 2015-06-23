@@ -25,7 +25,7 @@ defmodule AuthorizeNet.Customer do
     end
   end
 
-  @spec update(Integer, String.t, String.t, String.t) :: Integer
+  @spec update(Integer, String.t, String.t, String.t) :: :ok
   def update(customer_id, id, description, email) do
     Main.req :updateCustomerProfileRequest, [
       profile: [
@@ -51,5 +51,13 @@ defmodule AuthorizeNet.Customer do
      [id] = xml_value doc, "//customerProfileId"
      {id, ""} = Integer.parse id
      id
+  end
+
+  @spec delete(Integer) :: :ok
+  def delete(customer_id) do
+    Main.req :deleteCustomerProfileRequest, [
+      customerProfileId: to_string(customer_id)
+    ]
+    :ok
   end
 end

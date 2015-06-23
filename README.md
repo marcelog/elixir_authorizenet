@@ -4,6 +4,26 @@ AuthorizeNet
 Elixir client for the [Authorize.Net merchant API](http://developer.authorize.net/api/reference/index.html).
 This is WIP.
 
+## Customer Profiles
+
+### Creating
+```elixir
+  > AuthorizeNet.Customer.create "merchantId", "description", "email@host.com"
+  35926385
+```
+
+### Updating
+```elixir
+ > AuthorizeNet.Customer.update 35926385, "merchantId", "description", "email2@host.com"
+ :ok
+```
+
+### Deleting
+```elixir
+  > AuthorizeNet.Customer.delete 35926385
+  :ok
+```
+
 ## Errors
 
 These errors might be raised by the API calls:
