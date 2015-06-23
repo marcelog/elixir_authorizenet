@@ -12,5 +12,5 @@
   "jsx": {:hex, :jsx, "2.4.0"},
   "poison": {:hex, :poison, "1.2.1"},
   "ranch": {:hex, :ranch, "1.0.0"},
-  "servito": {:git, "git://github.com/marcelog/servito.git", "e4fc2fd9895796fcc67738ec2cb8a019ea0cc484", []},
+  "servito": {:git, "git://github.com/marcelog/servito.git", "83dc578abe90c9f383d5785ff8e42613c972eea2", []},
   "xml_builder": {:hex, :xml_builder, "0.0.6"}}

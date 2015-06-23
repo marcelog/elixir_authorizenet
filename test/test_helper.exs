@@ -26,6 +26,13 @@ defmodule AuthorizeNet.Test.Util do
     quote [location: :keep] do
       require Logger
 
+      defp validate(xml) do
+        case :xmerl_xsd.process_validate 'test/resources/AnetApiSchema.xsd', xml do
+          {:error, error} -> {:error, error}
+          _ -> :ok
+        end
+      end
+
       defp set_config(key, value) do
         Application.put_env :authorize_net, key, value
       end

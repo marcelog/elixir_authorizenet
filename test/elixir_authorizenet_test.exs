@@ -2,6 +2,8 @@ defmodule AuthorizeNetTest do
   use ExUnit.Case
   use Servito
   use AuthorizeNet.Test.Util
+  use AuthorizeNet.Helper.XML
+  require Logger
 
   setup do
     :timer.sleep 100
@@ -27,25 +29,49 @@ defmodule AuthorizeNetTest do
     stop_server
   end
 
+  test "can send credentials" do
+    request_assert "customer_profiles_get_all", "getCustomerProfileIdsRequest",
+      fn() -> AuthorizeNet.Customer.get_all end,
+      fn(body, msgs) ->
+        msgs = if xml_find(body, "//merchantAuthentication") === [] do
+          ["missing auth section"|msgs]
+        else
+          msgs
+        end
+        msgs = if xml_value(body, "//name") !== ["login_id"] do
+          ["wrong login id"|msgs]
+        else
+          msgs
+        end
+        msgs = if xml_value(body, "//transactionKey") !== ["transaction_key"] do
+          ["wrong transaction key"|msgs]
+        else
+          msgs
+        end
+        msgs
+      end,
+      fn(result) -> assert [35934704] === result end
+  end
+
   test "can get all customer profiles" do
-    start_server fn(_bindings, _headers, _body, req, state) ->
-      serve_file "customer_profiles_get_all"
-    end
-    assert [35934704] === AuthorizeNet.Customer.get_all
-    stop_server
+    request_assert "customer_profiles_get_all", "getCustomerProfileIdsRequest",
+      fn() -> AuthorizeNet.Customer.get_all end,
+      fn(_body, msgs) -> msgs end,
+      fn(result) -> assert [35934704] === result end
   end
 
   test "can get customer profile" do
-    start_server fn(_bindings, _headers, _body, req, state) ->
-      serve_file "customer_profile_get"
-    end
-    assert [
-      description: "description",
-      email: "email2@host.com",
-      merchantCustomerId: "merchantId",
-      customerProfileId: 35934704
-    ] === AuthorizeNet.Customer.get 35934704
-    stop_server
+    request_assert "customer_profile_get", "getCustomerProfileRequest",
+      fn() -> AuthorizeNet.Customer.get 35934704 end,
+      fn(_body, msgs) -> msgs end,
+      fn(result) ->
+        assert [
+          description: "description",
+          email: "email2@host.com",
+          merchantCustomerId: "merchantId",
+          customerProfileId: 35934704
+        ] === result
+      end
   end
 
   test "cant get inexistant profile" do
@@ -63,16 +89,19 @@ defmodule AuthorizeNetTest do
   end
 
   test "can create customer profile" do
-    start_server fn(_bindings, _headers, _body, req, state) ->
-      serve_file "create_customer_profile"
-    end
-    assert [
-      customerProfileId: 35934704,
-      merchantCustomerId: "merchantId",
-      description: "description",
-      email: "email@host.com"
-    ] === AuthorizeNet.Customer.create "merchantId", "description", "email@host.com"
-    stop_server
+    request_assert "create_customer_profile", "createCustomerProfileRequest",
+      fn() ->
+        AuthorizeNet.Customer.create "merchantId", "description", "email@host.com"
+      end,
+      fn(_body, msgs) -> msgs end,
+      fn(result) ->
+        assert [
+          customerProfileId: 35934704,
+          merchantCustomerId: "merchantId",
+          description: "description",
+          email: "email@host.com"
+        ] === result
+      end
   end
 
   test "cant create duplicated customer profile" do
@@ -90,25 +119,54 @@ defmodule AuthorizeNetTest do
   end
 
   test "can update duplicate customer profile" do
-    start_server fn(_bindings, _headers, _body, req, state) ->
-      serve_file "update_customer_profile"
-    end
-    assert [
-      merchantCustomerId: "merchantId2",
-      description: "description2",
-      email: "email2@host.com",
-      customerProfileId: 35934704
-    ] === AuthorizeNet.Customer.update(
-      35934704, "merchantId2", "description2", "email2@host.com"
-    )
-    stop_server
+    request_assert "update_customer_profile", "updateCustomerProfileRequest",
+      fn() ->
+        AuthorizeNet.Customer.update(
+          35934704, "merchantId2", "description2", "email2@host.com"
+        )
+      end,
+      fn(_body, msgs) -> msgs end,
+      fn(result) ->
+        assert [
+          merchantCustomerId: "merchantId2",
+          description: "description2",
+          email: "email2@host.com",
+          customerProfileId: 35934704
+        ] === result
+      end
   end
 
   test "can delete customer profile" do
-    start_server fn(_bindings, _headers, _body, req, state) ->
-      serve_file "delete_customer_profile"
+    request_assert "delete_customer_profile", "deleteCustomerProfileRequest",
+      fn() -> AuthorizeNet.Customer.delete 35934704 end,
+      fn(_body, msgs) -> msgs end,
+      fn(result) -> assert result === :ok end
+  end
+
+  defp request_assert(
+    file, request_type, request_fun, server_asserts_fun, client_asserts_fun
+  ) do
+    me = self
+    start_server fn(_bindings, _headers, body, req, state) ->
+      msgs = []
+      msgs = case validate body do
+        {:error, _error} -> ["invalid schema"|msgs]
+        :ok -> msgs
+      end
+      msgs = if xml_find(body, "//#{request_type}") === [] do
+        ["missing request section"|msgs]
+      else
+        msgs
+      end
+      msgs = server_asserts_fun.(body, msgs)
+      send me, msgs
+      serve_file file
     end
-    :ok = AuthorizeNet.Customer.delete 35934704
+    result = request_fun.()
     stop_server
+    receive do
+      [] -> client_asserts_fun.(result)
+      x -> flunk "Something went wrong with the request: #{inspect x}"
+    end
   end
 end

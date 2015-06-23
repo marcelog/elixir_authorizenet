@@ -25,7 +25,7 @@ defmodule AuthorizeNet.Helper.Http do
       {:connect_timeout, 60000}, {:inactivity_timeout, 60000},
       {:stream_chunk_size, 10}, {:ssl_options, [{:verify, :verify_none}]}
     ])
-    Logger.debug "Request Result: #{inspect ret}"
+    Logger.debug "Request #{inspect body} -- Result: #{inspect ret}"
     case ret do
       {:ok, status_code, retheaders, retbody} ->
         {status_code, _} = Integer.parse to_string(status_code)
