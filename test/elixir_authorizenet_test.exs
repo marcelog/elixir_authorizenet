@@ -8,6 +8,7 @@ defmodule AuthorizeNetTest do
   setup do
     :ok
   end
+
   test "can raise connection error on network issues" do
     assert_raise AuthorizeNet.Error.Connection, &AuthorizeNet.Customer.get_all/0
   end
@@ -37,17 +38,10 @@ defmodule AuthorizeNetTest do
         else
           msgs
         end
-        msgs = if xml_value(body, "//name") !== ["login_id"] do
-          ["wrong login id"|msgs]
-        else
-          msgs
-        end
-        msgs = if xml_value(body, "//transactionKey") !== ["transaction_key"] do
-          ["wrong transaction key"|msgs]
-        else
-          msgs
-        end
-        msgs
+        assert_fields body, msgs, [
+          {"name", "login_id"},
+          {"transactionKey", "transaction_key"}
+        ]
       end,
       fn(result) -> assert [35934704] === result end
   end
@@ -62,7 +56,9 @@ defmodule AuthorizeNetTest do
   test "can get customer profile" do
     request_assert "customer_profile_get", "getCustomerProfileRequest",
       fn() -> AuthorizeNet.Customer.get 35934704 end,
-      fn(_body, msgs) -> msgs end,
+      fn(body, msgs) ->
+        assert_fields body, msgs, [{"customerProfileId", "35934704"}]
+      end,
       fn(result) ->
         assert [
           description: "description",
@@ -92,7 +88,13 @@ defmodule AuthorizeNetTest do
       fn() ->
         AuthorizeNet.Customer.create "merchantId", "description", "email@host.com"
       end,
-      fn(_body, msgs) -> msgs end,
+      fn(body, msgs) ->
+        assert_fields body, msgs, [
+          {"merchantCustomerId", "merchantId"},
+          {"description", "description"},
+          {"email", "email@host.com"}
+        ]
+      end,
       fn(result) ->
         assert [
           customerProfileId: 35934704,
@@ -117,14 +119,21 @@ defmodule AuthorizeNetTest do
     stop_server
   end
 
-  test "can update duplicate customer profile" do
+  test "can update customer profile" do
     request_assert "update_customer_profile", "updateCustomerProfileRequest",
       fn() ->
         AuthorizeNet.Customer.update(
           35934704, "merchantId2", "description2", "email2@host.com"
         )
       end,
-      fn(_body, msgs) -> msgs end,
+      fn(body, msgs) ->
+        assert_fields body, msgs, [
+          {"description", "description2"},
+          {"email", "email2@host.com"},
+          {"merchantCustomerId", "merchantId2"},
+          {"customerProfileId", "35934704"}
+        ]
+      end,
       fn(result) ->
         assert [
           merchantCustomerId: "merchantId2",
@@ -138,8 +147,20 @@ defmodule AuthorizeNetTest do
   test "can delete customer profile" do
     request_assert "delete_customer_profile", "deleteCustomerProfileRequest",
       fn() -> AuthorizeNet.Customer.delete 35934704 end,
-      fn(_body, msgs) -> msgs end,
+      fn(body, msgs) ->
+        assert_fields body, msgs, [{"customerProfileId", "35934704"}]
+      end,
       fn(result) -> assert result === :ok end
+  end
+
+  defp assert_fields(xml, msgs, fields) do
+    Enum.reduce fields, msgs, fn({k, v}, acc) ->
+      if xml_value(xml, "//#{k}") === [v] do
+          acc
+      else
+        ["wrong #{k}"|acc]
+      end
+    end
   end
 
   defp request_assert(
