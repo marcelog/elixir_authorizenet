@@ -57,12 +57,18 @@ Payment profiles can be created with the functions:
  * **AuthorizeNet.PaymentProfile.create_business**: To create a "business" associated payment profile.
  * **AuthorizeNet.PaymentProfile.create_individual**: To create a payment profile for an individual, not associated to a business.
 
-### Creating a Credit Card
+To create a Payment Profile, you first need to create a billing address:
+
 ```elixir
   > address = AuthorizeNet.Address.new "street", "city", "state", "zip", "country", "phone", "fax"
   %AuthorizeNet.Address{address: "street", city: "city", country: "country",
    fax: "fax", phone: "phone", state: "state", zip: "zip"}
+```
 
+Then:
+
+### Creating a Credit Card
+```elixir
   > card = AuthorizeNet.Card.new "5424000000000015", "2015-08", "900"
   %AuthorizeNet.Card{code: "900", expiration_date: "2015-08",
    number: "5424000000000015"}
@@ -84,10 +90,6 @@ Bank accounts can be created via 3 functions:
  * **AuthorizeNet.BankAccount.business_checking**: A business checking account.
 
 ```elixir
-  > address = AuthorizeNet.Address.new "street", "city", "state", "zip", "country", "phone", "fax"
-  %AuthorizeNet.Address{address: "street", city: "city", country: "country",
-   fax: "fax", phone: "phone", state: "state", zip: "zip"}
-
   > account = AuthorizeNet.BankAccount.savings "bank_name", "routing_number", "account_number", "name_on_account", :ccd
   %AuthorizeNet.BankAccount{account_number: "account_number",
    bank_name: "bank_name", echeck_type: :ccd, name_on_account: "name_on_account",
