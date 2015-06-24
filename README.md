@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/marcelog/elixir_authorizenet.svg)](https://travis-ci.org/marcelog/elixir_authorizenet)
+
 elixir_authorizenet
 ===================
 
