@@ -1,4 +1,7 @@
 defmodule AuthorizeNet do
+  @moduledoc """
+  Handles API requests and responses.
+  """
   use AuthorizeNet.Helper.XML
   alias AuthorizeNet.Helper.Http, as: Http
   alias AuthorizeNet.Error.Connection, as: RequestError
@@ -9,6 +12,15 @@ defmodule AuthorizeNet do
   @uris sandbox: "https://apitest.authorize.net/xml/v1/request.api",
     production: "https://api.authorize.net/xml/v1/request.api"
 
+  @doc """
+  Makes a request to the Authorize.Net API. Adds authentication and parses
+  response. On success will return an xmlElement record. See:
+  http://www.erlang.org/doc/apps/xmerl/xmerl_ug.html
+
+  @raises AuthorizeNet.OperationError,
+    AuthorizeNet.ConnectionError,
+    AuthorizeNet.RequestError
+  """
   @spec req(Atom, Keyword.t) :: Record | no_return
   def req(requestType, parameters) do
     body = [{
@@ -33,6 +45,10 @@ defmodule AuthorizeNet do
     end
   end
 
+  @doc """
+  See: http://www.authorize.net/support/CIM_XML_guide.pdf under the section
+  called "The validationMode Parameter".
+  """
   @spec validation_mode() :: String.t
   def validation_mode() do
     case config :validation_mode do

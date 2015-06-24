@@ -24,9 +24,7 @@ defmodule AuthorizeNet.Mixfile do
   end
 
   defp description do
-    """
-    Elixir library to use AuthorizeNet API.
-    """
+    File.read! "README.md"
   end
 
   defp package do

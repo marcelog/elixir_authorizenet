@@ -1,4 +1,8 @@
 defmodule AuthorizeNet.Helper.Http do
+  @moduledoc """
+  "Low-level" HTTP requests helper. Move on, nothing to see here :)
+  """
+
   require Logger
 
   @typep header :: {char_list, char_list}

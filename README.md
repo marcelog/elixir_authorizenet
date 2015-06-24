@@ -9,15 +9,15 @@ This is WIP.
 ### Creating
 ```elixir
   > AuthorizeNet.Customer.create "merchantId", "description", "email@host.com"
-  [customerProfileId: 35934704, merchantCustomerId: "merchantId",
-   description: "description", email: "email@host.com"]
+  %AuthorizeNet.Customer{customerProfileId: 35934704, merchantCustomerId: "merchantId",
+   description: "description", email: "email@host.com"}
 ```
 
 ### Updating
 ```elixir
   > AuthorizeNet.Customer.update 35934704, "merchantId", "description", "email2@host.com"
-  [merchantCustomerId: "merchantId", description: "description",
-   email: "email2@host.com", customerProfileId: 35934704]
+  %AuthorizeNet.Customer{merchantCustomerId: "merchantId", description: "description",
+   email: "email2@host.com", customerProfileId: 35934704}
 ```
 
 ### Get all IDs
@@ -29,8 +29,8 @@ This is WIP.
 ### Get Customer Profile
 ```elixir
   > AuthorizeNet.Customer.get 35934704
-  [description: "description", email: "email2@host.com",
-   merchantCustomerId: "merchantId", customerProfileId: 35934704]
+  %AuthorizeNet.Customer{description: "description", email: "email2@host.com",
+   merchantCustomerId: "merchantId", customerProfileId: 35934704}
 ```
 
 ### Deleting

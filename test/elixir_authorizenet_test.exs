@@ -60,12 +60,12 @@ defmodule AuthorizeNetTest do
         assert_fields body, msgs, [{"customerProfileId", "35934704"}]
       end,
       fn(result) ->
-        assert [
+        assert %AuthorizeNet.Customer{
           description: "description",
           email: "email2@host.com",
           merchantCustomerId: "merchantId",
           customerProfileId: 35934704
-        ] === result
+        } === result
       end
   end
 
@@ -96,12 +96,12 @@ defmodule AuthorizeNetTest do
         ]
       end,
       fn(result) ->
-        assert [
+        assert %AuthorizeNet.Customer{
           customerProfileId: 35934704,
           merchantCustomerId: "merchantId",
           description: "description",
           email: "email@host.com"
-        ] === result
+        } === result
       end
   end
 
@@ -135,12 +135,12 @@ defmodule AuthorizeNetTest do
         ]
       end,
       fn(result) ->
-        assert [
+        assert %AuthorizeNet.Customer{
           merchantCustomerId: "merchantId2",
           description: "description2",
           email: "email2@host.com",
           customerProfileId: 35934704
-        ] === result
+        } === result
       end
   end
 

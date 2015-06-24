@@ -1,21 +1,28 @@
 defmodule AuthorizeNet.Customer do
+  @moduledoc """
+  Handles customer profiles (http://developer.authorize.net/api/reference/index.html#manage-customer-profiles).
+  """
   use AuthorizeNet.Helper.XML
   alias AuthorizeNet, as: Main
+  defstruct description: nil,
+    email: nil,
+    merchantCustomerId: nil,
+    customerProfileId: nil
 
-  @type customer :: Keyword.t
+  @type t :: %AuthorizeNet.Customer{}
 
-  @spec get(Integer):: customer | no_return
+  @spec get(Integer):: AuthorizeNet.Customer.t | no_return
   def get(id) do
     doc = Main.req :getCustomerProfileRequest, [customerProfileId: id]
     [description] = xml_value doc, "//description"
     [email] = xml_value doc, "//email"
     [merchantCustomerId] = xml_value doc, "//merchantCustomerId"
-    [
+    %AuthorizeNet.Customer{
       description: description,
       email: email,
       merchantCustomerId: merchantCustomerId,
       customerProfileId: id
-    ]
+    }
   end
 
   @spec get_all():: [Integer]
@@ -27,7 +34,7 @@ defmodule AuthorizeNet.Customer do
     end
   end
 
-  @spec update(Integer, String.t, String.t, String.t) :: customer | no_return
+  @spec update(Integer, String.t, String.t, String.t) :: AuthorizeNet.Customer.t | no_return
   def update(customer_id, id, description, email) do
     profile = [
       merchantCustomerId: id,
@@ -36,10 +43,15 @@ defmodule AuthorizeNet.Customer do
       customerProfileId: customer_id
     ]
     Main.req :updateCustomerProfileRequest, [profile: profile]
-    profile
+    %AuthorizeNet.Customer{
+      merchantCustomerId: id,
+      description: description,
+      email: email,
+      customerProfileId: customer_id
+    }
   end
 
-  @spec create(String.t, String.t, String.t) :: customer | no_return
+  @spec create(String.t, String.t, String.t) :: AuthorizeNet.Customer.t | no_return
   def create(id, description, email) do
     profile = [
       merchantCustomerId: id,
@@ -50,9 +62,14 @@ defmodule AuthorizeNet.Customer do
       profile: profile,
       validationMode: "none"
     ]
-     [id] = xml_value doc, "//customerProfileId"
-     {id, ""} = Integer.parse id
-     Keyword.put profile, :customerProfileId, id
+   [customer_id] = xml_value doc, "//customerProfileId"
+   {customer_id, ""} = Integer.parse customer_id
+    %AuthorizeNet.Customer{
+      merchantCustomerId: id,
+      description: description,
+      email: email,
+      customerProfileId: customer_id
+    }
   end
 
   @spec delete(Integer) :: :ok | no_return

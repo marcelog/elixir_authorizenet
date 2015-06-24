@@ -1,4 +1,8 @@
 defmodule AuthorizeNet.Helper.XML do
+  @moduledoc """
+  "Low-level" XML helper. Move on, nothing to see here :)
+  """
+
   defmacro __using__(_opts) do
     quote do
       import AuthorizeNet.Helper.XML
