@@ -153,6 +153,248 @@ defmodule AuthorizeNetTest do
       fn(result) -> assert result === :ok end
   end
 
+  test "can create invidual credit card payment profile" do
+    address = AuthorizeNet.Address.new(
+      "street", "city", "state", "zip", "country", "phone", "fax"
+    )
+    card = AuthorizeNet.Card.new "5424000000000015", "2015-08", "900"
+
+    request_assert "create_payment_profile", "createCustomerPaymentProfileRequest",
+      fn() ->
+        AuthorizeNet.PaymentProfile.create_individual(
+          35938239, "first", "last", "company", address, card
+        )
+      end,
+      fn(body, msgs) ->
+        assert_fields body, msgs, [
+          {"cardCode", "900"},
+          {"expirationDate", "2015-08"},
+          {"cardNumber", "5424000000000015"},
+          {"faxNumber", "fax"},
+          {"phoneNumber", "phone"},
+          {"country", "country"},
+          {"zip", "zip"},
+          {"state", "state"},
+          {"city", "city"},
+          {"address", "street"},
+          {"company", "company"},
+          {"lastName", "last"},
+          {"firstName", "first"},
+          {"customerType", "individual"},
+          {"customerProfileId", "35938239"}
+        ]
+      end,
+      fn(result) ->
+        assert %AuthorizeNet.PaymentProfile{
+          profile_id: 32500845,
+          customer_id: 35938239,
+          address: address,
+          type: :individual,
+          payment_type: card,
+          company: "company",
+          first_name: "first",
+          last_name: "last"
+        } === result
+      end
+  end
+
+  test "can create business credit card payment profile" do
+    address = AuthorizeNet.Address.new(
+      "street", "city", "state", "zip", "country", "phone", "fax"
+    )
+    card = AuthorizeNet.Card.new "5424000000000015", "2015-08", "900"
+
+    request_assert "create_payment_profile", "createCustomerPaymentProfileRequest",
+      fn() ->
+        AuthorizeNet.PaymentProfile.create_business(
+          35938239, "first", "last", "company", address, card
+        )
+      end,
+      fn(body, msgs) ->
+        assert_fields body, msgs, [
+          {"cardCode", "900"},
+          {"expirationDate", "2015-08"},
+          {"cardNumber", "5424000000000015"},
+          {"faxNumber", "fax"},
+          {"phoneNumber", "phone"},
+          {"country", "country"},
+          {"zip", "zip"},
+          {"state", "state"},
+          {"city", "city"},
+          {"address", "street"},
+          {"company", "company"},
+          {"lastName", "last"},
+          {"firstName", "first"},
+          {"customerType", "business"},
+          {"customerProfileId", "35938239"}
+        ]
+      end,
+      fn(result) ->
+        assert %AuthorizeNet.PaymentProfile{
+          profile_id: 32500845,
+          customer_id: 35938239,
+          address: address,
+          type: :business,
+          payment_type: card,
+          company: "company",
+          first_name: "first",
+          last_name: "last"
+        } === result
+      end
+  end
+
+  test "cant create account with invalid echeck type" do
+    assert_raise ArgumentError, fn() ->
+      AuthorizeNet.BankAccount.savings(
+        "bank", "111", "222", "name", :whatever
+      )
+    end
+  end
+
+  test "can create savings bank account payment profile" do
+    address = AuthorizeNet.Address.new(
+      "street", "city", "state", "zip", "country", "phone", "fax"
+    )
+    account = AuthorizeNet.BankAccount.savings(
+      "bank", "111", "222", "name", :ccd
+    )
+
+    request_assert "create_payment_profile", "createCustomerPaymentProfileRequest",
+      fn() ->
+        AuthorizeNet.PaymentProfile.create_individual(
+          35938239, "first", "last", "company", address, account
+        )
+      end,
+      fn(body, msgs) ->
+        assert_fields body, msgs, [
+          {"bankName", "bank"},
+          {"echeckType", "CCD"},
+          {"nameOnAccount", "name"},
+          {"accountNumber", "222"},
+          {"routingNumber", "111"},
+          {"accountType", "savings"},
+          {"country", "country"},
+          {"zip", "zip"},
+          {"state", "state"},
+          {"city", "city"},
+          {"address", "street"},
+          {"company", "company"},
+          {"lastName", "last"},
+          {"firstName", "first"},
+          {"customerType", "individual"},
+          {"customerProfileId", "35938239"}
+        ]
+      end,
+      fn(result) ->
+        assert %AuthorizeNet.PaymentProfile{
+          profile_id: 32500845,
+          customer_id: 35938239,
+          address: address,
+          type: :individual,
+          payment_type: account,
+          company: "company",
+          first_name: "first",
+          last_name: "last"
+        } === result
+      end
+  end
+
+  test "can create checking bank account payment profile" do
+    address = AuthorizeNet.Address.new(
+      "street", "city", "state", "zip", "country", "phone", "fax"
+    )
+    account = AuthorizeNet.BankAccount.checking(
+      "bank", "111", "222", "name", :web
+    )
+
+    request_assert "create_payment_profile", "createCustomerPaymentProfileRequest",
+      fn() ->
+        AuthorizeNet.PaymentProfile.create_individual(
+          35938239, "first", "last", "company", address, account
+        )
+      end,
+      fn(body, msgs) ->
+        assert_fields body, msgs, [
+          {"bankName", "bank"},
+          {"echeckType", "WEB"},
+          {"nameOnAccount", "name"},
+          {"accountNumber", "222"},
+          {"routingNumber", "111"},
+          {"accountType", "checking"},
+          {"country", "country"},
+          {"zip", "zip"},
+          {"state", "state"},
+          {"city", "city"},
+          {"address", "street"},
+          {"company", "company"},
+          {"lastName", "last"},
+          {"firstName", "first"},
+          {"customerType", "individual"},
+          {"customerProfileId", "35938239"}
+        ]
+      end,
+      fn(result) ->
+        assert %AuthorizeNet.PaymentProfile{
+          profile_id: 32500845,
+          customer_id: 35938239,
+          address: address,
+          type: :individual,
+          payment_type: account,
+          company: "company",
+          first_name: "first",
+          last_name: "last"
+        } === result
+      end
+  end
+
+  test "can create business checking bank account payment profile" do
+    address = AuthorizeNet.Address.new(
+      "street", "city", "state", "zip", "country", "phone", "fax"
+    )
+    account = AuthorizeNet.BankAccount.business_checking(
+      "bank", "111", "222", "name", :ppd
+    )
+
+    request_assert "create_payment_profile", "createCustomerPaymentProfileRequest",
+      fn() ->
+        AuthorizeNet.PaymentProfile.create_individual(
+          35938239, "first", "last", "company", address, account
+        )
+      end,
+      fn(body, msgs) ->
+        assert_fields body, msgs, [
+          {"bankName", "bank"},
+          {"echeckType", "PPD"},
+          {"nameOnAccount", "name"},
+          {"accountNumber", "222"},
+          {"routingNumber", "111"},
+          {"accountType", "businessChecking"},
+          {"country", "country"},
+          {"zip", "zip"},
+          {"state", "state"},
+          {"city", "city"},
+          {"address", "street"},
+          {"company", "company"},
+          {"lastName", "last"},
+          {"firstName", "first"},
+          {"customerType", "individual"},
+          {"customerProfileId", "35938239"}
+        ]
+      end,
+      fn(result) ->
+        assert %AuthorizeNet.PaymentProfile{
+          profile_id: 32500845,
+          customer_id: 35938239,
+          address: address,
+          type: :individual,
+          payment_type: account,
+          company: "company",
+          first_name: "first",
+          last_name: "last"
+        } === result
+      end
+  end
+
   defp assert_fields(xml, msgs, fields) do
     Enum.reduce fields, msgs, fn({k, v}, acc) ->
       if xml_value(xml, "//#{k}") === [v] do
