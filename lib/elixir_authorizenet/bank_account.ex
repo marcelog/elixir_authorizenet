@@ -30,7 +30,7 @@ defmodule AuthorizeNet.BankAccount do
   @doc """
   Creates a new savings account.
   """
-  @spec business_checking(
+  @spec savings(
     String.t, String.t, String.t, String.t,
     AuthorizeNet.BankAccount.echeck_type
   ) :: AuthorizeNet.BankAccount.t | no_return
@@ -46,7 +46,7 @@ defmodule AuthorizeNet.BankAccount do
   @doc """
   Creates a new checking account.
   """
-  @spec business_checking(
+  @spec checking(
     String.t, String.t, String.t, String.t,
     AuthorizeNet.BankAccount.echeck_type
   ) :: AuthorizeNet.BankAccount.t | no_return
