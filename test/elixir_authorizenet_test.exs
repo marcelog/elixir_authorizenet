@@ -468,6 +468,18 @@ defmodule AuthorizeNetTest do
       end
   end
 
+  test "can delete payment profile" do
+    request_assert "delete_payment_profile", "deleteCustomerPaymentProfileRequest",
+      fn() -> AuthorizeNet.PaymentProfile.delete 35947873, 32500939 end,
+      fn(body, msgs) ->
+        assert_fields body, msgs, [
+          {"customerProfileId", "35947873"},
+          {"customerPaymentProfileId", "32500939"}
+        ]
+      end,
+      fn(result) -> assert result === :ok end
+  end
+
   defp request_assert(
     file, request_type, request_fun, server_asserts_fun, client_asserts_fun
   ) do

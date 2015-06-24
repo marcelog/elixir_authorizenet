@@ -40,7 +40,7 @@ defmodule AuthorizeNet.Customer do
   Returns all customer profile IDs known by Authorize.Net. See:
   http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-get-customer-profile-ids
   """
-  @spec get_all():: [Integer]
+  @spec get_all():: [Integer] | no_return
   def get_all() do
     doc = Main.req :getCustomerProfileIdsRequest, []
     for profile_id <- xml_value doc, "//numericString"  do
@@ -100,7 +100,7 @@ defmodule AuthorizeNet.Customer do
 
   @spec new(
     String.t, Integer, String.t, String.t, [PaymentProfile.t]
-  ) :: AuthorizeNet.Customer.t
+  ) :: AuthorizeNet.Customer.t | no_return
   defp new(id, profile_id, description, email, payment_profiles \\ []) do
     %AuthorizeNet.Customer{
       id: id,

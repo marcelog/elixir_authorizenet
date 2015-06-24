@@ -62,13 +62,26 @@ defmodule AuthorizeNet.PaymentProfile do
   Returns a Payment Profile. See:
   http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-get-customer-payment-profile
   """
-  @spec get(Integer, Integer) :: AuthorizeNet.PaymentProfile.t
+  @spec get(Integer, Integer) :: AuthorizeNet.PaymentProfile.t | no_return
   def get(customer_id, profile_id) do
     doc = Main.req :getCustomerPaymentProfileRequest, [
       customerProfileId: customer_id,
       customerPaymentProfileId: profile_id
     ]
     from_xml doc, customer_id
+  end
+
+  @doc """
+  Deletes a Payment Profile. See:
+  http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-delete-customer-payment-profile
+  """
+  @spec delete(Integer, Integer) :: :ok | no_return
+  def delete(customer_id, profile_id) do
+    Main.req :deleteCustomerPaymentProfileRequest, [
+      customerProfileId: customer_id,
+      customerPaymentProfileId: profile_id
+    ]
+    :ok
   end
 
   @doc """
@@ -124,7 +137,7 @@ defmodule AuthorizeNet.PaymentProfile do
     %AuthorizeNet.PaymentProfile{profile | profile_id: profile_id}
   end
 
-  @spec create(
+  @spec new(
     String.t, Integer, Integer, String.t, String.t, Address.t,
     Address.t, AuthorizeNet.PaymentProfile.payment_type
   ) :: AuthorizeNet.PaymentProfile.t | no_return

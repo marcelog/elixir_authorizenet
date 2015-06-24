@@ -115,7 +115,7 @@ The last argument is the type of [echeck](https://www.authorize.net/support/CNP/
   number: "XXXX0015"}, profile_id: 32500939, type: :individual}
 ```
 
-### Validating a payment profile
+### Validating
 ```elixir
   > AuthorizeNet.PaymentProfile.valid? 35947873, 32500939
   {false,
@@ -125,6 +125,11 @@ The last argument is the type of [echeck](https://www.authorize.net/support/CNP/
   true
 ```
 
+### Deleting
+```elixir
+  > AuthorizeNet.PaymentProfile.delete 35947873, 32500879
+  :ok
+```
 ## Errors
 
 These errors might be raised by the API calls:
