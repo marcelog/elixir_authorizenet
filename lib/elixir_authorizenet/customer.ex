@@ -18,13 +18,30 @@ defmodule AuthorizeNet.Customer do
   use AuthorizeNet.Helper.XML
   alias AuthorizeNet, as: Main
   alias AuthorizeNet.PaymentProfile, as: PaymentProfile
+  alias AuthorizeNet.Address, as: Address
   defstruct description: nil,
     email: nil,
     id: nil,
     profile_id: nil,
-    payment_profiles: []
+    payment_profiles: [],
+    shipping_addresses: []
 
   @type t :: %AuthorizeNet.Customer{}
+
+  @doc """
+  Creates a shipping address for the customer. See:
+  http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-create-customer-shipping-address
+  """
+  @spec create_shipping_address(Integer, Address.t) :: Address.t
+  def create_shipping_address(profile_id, address) do
+    doc = Main.req :createCustomerShippingAddressRequest, [
+      customerProfileId: profile_id,
+      address: Address.to_xml(address)
+    ]
+   [address_id] = xml_value doc, "//customerAddressId"
+   {address_id, ""} = Integer.parse address_id
+   %AuthorizeNet.Address{address | id: address_id, customer_id: profile_id}
+  end
 
   @doc """
   Returns a customer profile by customer profile ID. See:
@@ -99,15 +116,19 @@ defmodule AuthorizeNet.Customer do
   end
 
   @spec new(
-    String.t, Integer, String.t, String.t, [PaymentProfile.t]
+    String.t, Integer, String.t, String.t, [PaymentProfile.t], [Address.t]
   ) :: AuthorizeNet.Customer.t | no_return
-  defp new(id, profile_id, description, email, payment_profiles \\ []) do
+  defp new(
+    id, profile_id, description, email,
+    payment_profiles \\ [], shipping_addresses \\ []
+  ) do
     %AuthorizeNet.Customer{
       id: id,
       description: description,
       email: email,
       profile_id: profile_id,
-      payment_profiles: payment_profiles
+      payment_profiles: payment_profiles,
+      shipping_addresses: shipping_addresses
     }
   end
 
@@ -134,12 +155,16 @@ defmodule AuthorizeNet.Customer do
     payment_profiles = for p <- xml_find(doc, "//paymentProfiles") do
       PaymentProfile.from_xml p, profile_id
     end
+    shipping_addresses = for a <- xml_find(doc, "//shipToList") do
+      Address.from_xml a, profile_id
+    end
     new(
       xml_one_value(doc, "//merchantCustomerId"),
       profile_id,
       xml_one_value(doc, "//description"),
       xml_one_value(doc, "//email"),
-      payment_profiles
+      payment_profiles,
+      shipping_addresses
     )
   end
 end

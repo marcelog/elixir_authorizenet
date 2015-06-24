@@ -22,7 +22,9 @@ defmodule AuthorizeNet.Address do
     zip: nil,
     country: nil,
     phone: nil,
-    fax: nil
+    fax: nil,
+    id: nil,
+    customer_id: nil
 
   @type t :: %AuthorizeNet.Address{}
 
@@ -64,9 +66,15 @@ defmodule AuthorizeNet.Address do
   @doc """
   Builds an Address from an xmlElement record.
   """
-  @spec from_xml(Record) :: AuthorizeNet.Address.t
-  def from_xml(doc) do
-    new(
+  @spec from_xml(Record, Integer) :: AuthorizeNet.Address.t
+  def from_xml(doc, customer_id \\ nil) do
+    id = case xml_one_value(doc, "//customerAddressId") do
+      nil -> nil
+      id ->
+       {id, ""} = Integer.parse id
+       id
+    end
+    profile = new(
       xml_one_value(doc, "//address"),
       xml_one_value(doc, "//city"),
       xml_one_value(doc, "//state"),
@@ -75,5 +83,6 @@ defmodule AuthorizeNet.Address do
       xml_one_value(doc, "//phoneNumber"),
       xml_one_value(doc, "//faxNumber")
     )
+    %AuthorizeNet.Address{profile | id: id, customer_id: customer_id}
   end
 end

@@ -19,6 +19,8 @@ end
 ```
 Then run mix deps.get to install it.
 
+----
+
 ## Customer Profiles
 
 ### Creating
@@ -53,6 +55,15 @@ Then run mix deps.get to install it.
   > AuthorizeNet.Customer.delete 35934704
   :ok
 ```
+
+### Creating a Shipping Address
+```elixir
+  > AuthorizeNet.Customer.create_shipping_address 35947873, address
+  %AuthorizeNet.Address{address: "street", city: "city", country: "country",
+   customer_id: 35947873, fax: "fax", id: 34065443, phone: "phone",
+   state: "state", zip: "zip"}
+```
+----
 
 ## Customer Payment Profiles
 
@@ -130,6 +141,9 @@ The last argument is the type of [echeck](https://www.authorize.net/support/CNP/
   > AuthorizeNet.PaymentProfile.delete 35947873, 32500879
   :ok
 ```
+
+----
+
 ## Errors
 
 These errors might be raised by the API calls:
@@ -142,5 +156,9 @@ These errors might be raised by the API calls:
 
 ## License
 The source code is released under Apache 2 License.
+
+## TODO
+ * Add support for updating a payment profile.
+ * Allow payment profiles when creating a customer profile.
 
 Check [LICENSE](https://github.com/marcelog/elixir_authorizenet/blob/master/LICENSE) file for more information.

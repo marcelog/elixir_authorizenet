@@ -480,6 +480,38 @@ defmodule AuthorizeNetTest do
       fn(result) -> assert result === :ok end
   end
 
+  test "can create shipping address" do
+    address = AuthorizeNet.Address.new(
+      "street", "city", "state", "zip", "country", "phone", "fax"
+    )
+    request_assert "create_shipping_address", "createCustomerShippingAddressRequest",
+      fn() -> AuthorizeNet.Customer.create_shipping_address 35947873, address end,
+      fn(body, msgs) ->
+        assert_fields body, msgs, [
+          {"customerProfileId", "35947873"},
+          {"country", "country"},
+          {"zip", "zip"},
+          {"state", "state"},
+          {"city", "city"},
+          {"phoneNumber", "phone"},
+          {"faxNumber", "fax"}
+        ]
+      end,
+      fn(result) ->
+        assert %AuthorizeNet.Address{
+          customer_id: 35947873,
+          id: 34065116,
+          country: "country",
+          zip: "zip",
+          phone: "phone",
+          fax: "fax",
+          address: "street",
+          city: "city",
+          state: "state"
+        } === result
+      end
+  end
+
   defp request_assert(
     file, request_type, request_fun, server_asserts_fun, client_asserts_fun
   ) do
