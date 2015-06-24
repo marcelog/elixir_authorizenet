@@ -1,26 +1,26 @@
-AuthorizeNet
-============
+elixir_authorizenet
+===================
 
 Elixir client for the [Authorize.Net merchant API](http://developer.authorize.net/api/reference/index.html).
 This is WIP.
 
-## Customer Profiles
+# Customer Profiles
 
-### Creating
+## Creating
 ```elixir
   > AuthorizeNet.Customer.create "merchantId", "description", "email@host.com"
   %AuthorizeNet.Customer{profile_id: 35934704, id: "merchantId",
    description: "description", email: "email@host.com", payment_profiles: []}
 ```
 
-### Updating
+## Updating
 ```elixir
   > AuthorizeNet.Customer.update 35934704, "merchantId", "description", "email2@host.com"
   %AuthorizeNet.Customer{id: "merchantId", description: "description",
    email: "email2@host.com", profile_id: 35934704, payment_profiles: []}
 ```
 
-### Get all IDs
+## Get all IDs
 ```elixir
   > AuthorizeNet.Customer.get_all
   [35934704]
@@ -40,6 +40,11 @@ This is WIP.
 ```
 
 ## Customer Payment Profiles
+
+Payment profiles can be created with the functions:
+
+ * **AuthorizeNet.PaymentProfile.create_business**: To create a "business" associated payment profile.
+ * **AuthorizeNet.PaymentProfile.create_individual**: To create a payment profile for an individual, not associated to a business.
 
 ### Creating a Credit Card
 ```elixir
@@ -61,6 +66,12 @@ This is WIP.
 ```
 
 ### Creating a bank account
+Bank accounts can be created via 3 functions:
+
+ * **AuthorizeNet.BankAccount.savings**: A savings account.
+ * **AuthorizeNet.BankAccount.checking**: A checking account.
+ * **AuthorizeNet.BankAccount.business_checking**: A business checking account.
+
 ```elixir
   > address = AuthorizeNet.Address.new "street", "city", "state", "zip", "country", "phone", "fax"
   %AuthorizeNet.Address{address: "street", city: "city", country: "country",
@@ -74,8 +85,7 @@ This is WIP.
   > AuthorizeNet.PaymentProfile.create_individual 35947873, "first_name", "last_name", "company", address, account
 ```
 
-You can also call `AuthorizeNet.BankAccount.checking` and `AuthorizeNet.BankAccount.business_checking` to create a "checking" and "business checking" account respectively. The last argument is the type of
-[echeck](https://www.authorize.net/support/CNP/helpfiles/Miscellaneous/Pop-up_Terms/ALL/eCheck.Net_Type.htm).
+The last argument is the type of [echeck](https://www.authorize.net/support/CNP/helpfiles/Miscellaneous/Pop-up_Terms/ALL/eCheck.Net_Type.htm).
 
 ### Getting a payment profile
 ```elixir
