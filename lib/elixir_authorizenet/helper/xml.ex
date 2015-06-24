@@ -31,4 +31,13 @@ defmodule AuthorizeNet.Helper.XML do
       for e <- elements, do: to_string xmlText(e, :value)
     end
   end
+
+  defmacro xml_one_value(doc, element) do
+    quote [location: :keep] do
+      case xml_find unquote(doc), "#{unquote(element)}/text()" do
+        [] -> nil
+        [e] -> to_string xmlText(e, :value)
+      end
+    end
+  end
 end

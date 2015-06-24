@@ -68,6 +68,7 @@ defmodule AuthorizeNet.Test.Util do
 
       defp stop_server() do
         unserve :authnet_dummy
+        :timer.sleep 100
       end
     end
   end

@@ -49,21 +49,20 @@ defmodule AuthorizeNet.Helper.Http do
     Enum.reverse acc
   end
 
-  defp format_xml([{k, a, v}|rest], acc) do
-    v = if is_list(v) do
-      format_xml v
-    else
-      v
+  defp format_xml([e|rest], acc) do
+    {k, a, v} = case e do
+      {k, v} -> {k, %{}, v}
+      {k, a, v} -> {k, a, v}
     end
-    format_xml rest, [{k, a, v}|acc]
-  end
-
-  defp format_xml([{k, v}|rest], acc) do
-    v = if is_list(v) do
-      format_xml v
-    else
-      v
+    case v do
+      nil -> format_xml rest, acc
+      _ ->
+        v = if is_list(v) do
+          format_xml v
+        else
+          v
+        end
+        format_xml rest, [{k, a, v}|acc]
     end
-    format_xml rest, [{k, %{}, v}|acc]
   end
 end

@@ -63,8 +63,8 @@ defmodule AuthorizeNetTest do
         assert %AuthorizeNet.Customer{
           description: "description",
           email: "email2@host.com",
-          merchantCustomerId: "merchantId",
-          customerProfileId: 35934704
+          id: "merchantId",
+          profile_id: 35934704
         } === result
       end
   end
@@ -97,8 +97,8 @@ defmodule AuthorizeNetTest do
       end,
       fn(result) ->
         assert %AuthorizeNet.Customer{
-          customerProfileId: 35934704,
-          merchantCustomerId: "merchantId",
+          profile_id: 35934704,
+          id: "merchantId",
           description: "description",
           email: "email@host.com"
         } === result
@@ -136,10 +136,10 @@ defmodule AuthorizeNetTest do
       end,
       fn(result) ->
         assert %AuthorizeNet.Customer{
-          merchantCustomerId: "merchantId2",
+          id: "merchantId2",
           description: "description2",
           email: "email2@host.com",
-          customerProfileId: 35934704
+          profile_id: 35934704
         } === result
       end
   end
