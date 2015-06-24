@@ -27,7 +27,8 @@ defmodule AuthorizeNet.Customer do
   @type t :: %AuthorizeNet.Customer{}
 
   @doc """
-  Returns a customer profile by customer profile ID.
+  Returns a customer profile by customer profile ID. See:
+  http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-get-customer-profile
   """
   @spec get(Integer):: AuthorizeNet.Customer.t | no_return
   def get(profile_id) do
@@ -36,7 +37,8 @@ defmodule AuthorizeNet.Customer do
   end
 
   @doc """
-  Returns all customer profile IDs known by Authorize.Net.
+  Returns all customer profile IDs known by Authorize.Net. See:
+  http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-get-customer-profile-ids
   """
   @spec get_all():: [Integer]
   def get_all() do
@@ -48,7 +50,8 @@ defmodule AuthorizeNet.Customer do
   end
 
   @doc """
-  Updates a customer profile given a valid customer profile ID.
+  Updates a customer profile given a valid customer profile ID. See:
+  http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-update-customer-profile
   """
   @spec update(
     Integer, String.t, String.t, String.t
@@ -65,7 +68,8 @@ defmodule AuthorizeNet.Customer do
   end
 
   @doc """
-  Creates a customer profile.
+  Creates a customer profile. See:
+  http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-create-customer-profile
   """
   @spec create(
     String.t, String.t, String.t
@@ -83,7 +87,8 @@ defmodule AuthorizeNet.Customer do
   end
 
   @doc """
-  Deletes a customer profile by customer profile ID.
+  Deletes a customer profile by customer profile ID. See:
+  http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-delete-customer-profile
   """
   @spec delete(Integer) :: :ok | no_return
   def delete(customer_id) do

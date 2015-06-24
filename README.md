@@ -6,6 +6,8 @@ elixir_authorizenet
 Elixir client for the [Authorize.Net merchant API](http://developer.authorize.net/api/reference/index.html).
 This is WIP.
 
+Take a look at the [documentation](http://hexdocs.pm/elixir_authorizenet/) served by hex.pm.
+
 ## Using it with Mix
 
 To use it in your Mix projects, first add it as a dependency:
@@ -111,6 +113,16 @@ The last argument is the type of [echeck](https://www.authorize.net/support/CNP/
  first_name: "first_name", last_name: "last_name",
  payment_type: %AuthorizeNet.Card{code: nil, expiration_date: "XXXX",
   number: "XXXX0015"}, profile_id: 32500939, type: :individual}
+```
+
+### Validating a payment profile
+```elixir
+  > AuthorizeNet.PaymentProfile.valid? 35947873, 32500939
+  {false,
+   %AuthorizeNet.Error.Operation{message: [{"E00027", "Card Code is required."}]}}
+
+  > AuthorizeNet.PaymentProfile.valid? 35947873, 32500939, "900"
+  true
 ```
 
 ## Errors

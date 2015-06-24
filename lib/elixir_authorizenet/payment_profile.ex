@@ -39,6 +39,29 @@ defmodule AuthorizeNet.PaymentProfile do
   @type payment_type :: BankAccount.t | Card.t
   @type profile_type :: :individual | :business
 
+  @doc """
+  Validates a payment profile by generating a test transaction. See:
+  http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-validate-customer-payment-profile
+  """
+  @spec valid?(Integer, Integer, String.t | nil) :: true | {false, term}
+  def valid?(customer_id, profile_id, card_code \\ nil) do
+    try do
+      doc = Main.req :validateCustomerPaymentProfileRequest, [
+        customerProfileId: customer_id,
+        customerPaymentProfileId: profile_id,
+        cardCode: card_code,
+        validationMode: Main.validation_mode
+      ]
+      true
+    rescue
+      e -> {false, e}
+    end
+  end
+
+  @doc """
+  Returns a Payment Profile. See:
+  http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-get-customer-payment-profile
+  """
   @spec get(Integer, Integer) :: AuthorizeNet.PaymentProfile.t
   def get(customer_id, profile_id) do
     doc = Main.req :getCustomerPaymentProfileRequest, [
@@ -49,7 +72,8 @@ defmodule AuthorizeNet.PaymentProfile do
   end
 
   @doc """
-  Creates a payment profile for an "invidual".
+  Creates a payment profile for an "invidual". See:
+  http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-create-customer-payment-profile
   """
   @spec create_individual(
     Integer, String.t, String.t, String.t, Address.t,
@@ -65,7 +89,8 @@ defmodule AuthorizeNet.PaymentProfile do
   end
 
   @doc """
-  Creates a payment profile for a "business".
+  Creates a payment profile for a "business". See:
+  http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-create-customer-payment-profile
   """
   @spec create_business(
     Integer, String.t, String.t, String.t, Address.t,

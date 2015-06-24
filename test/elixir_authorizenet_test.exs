@@ -437,6 +437,37 @@ defmodule AuthorizeNetTest do
       end
   end
 
+  test "can validate payment profile" do
+    request_assert "valid_payment_profile", "validateCustomerPaymentProfileRequest",
+      fn() -> AuthorizeNet.PaymentProfile.valid? 35947873, 32500939, 900 end,
+      fn(body, msgs) ->
+        assert_fields body, msgs, [
+          {"customerProfileId", "35947873"},
+          {"customerPaymentProfileId", "32500939"},
+          {"cardCode", "900"},
+          {"validationMode", "none"}
+        ]
+      end,
+      fn(result) -> assert result end
+
+    request_assert "invalid_payment_profile", "validateCustomerPaymentProfileRequest",
+      fn() -> AuthorizeNet.PaymentProfile.valid? 35947873, 32500939, 900 end,
+      fn(body, msgs) ->
+        assert_fields body, msgs, [
+          {"customerProfileId", "35947873"},
+          {"customerPaymentProfileId", "32500939"},
+          {"cardCode", "900"},
+          {"validationMode", "none"}
+        ]
+      end,
+      fn(result) ->
+        assert result === {
+          false,
+          %AuthorizeNet.Error.Operation{message: [{"E00027", "Card Code is required."}]}
+        }
+      end
+  end
+
   defp assert_fields(xml, msgs, fields) do
     Enum.reduce fields, msgs, fn({k, v}, acc) ->
       if xml_value(xml, "//#{k}") === [v] do
