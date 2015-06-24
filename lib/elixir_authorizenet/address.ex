@@ -54,13 +54,13 @@ defmodule AuthorizeNet.Address do
   @spec from_xml(Record) :: AuthorizeNet.Address.t
   def from_xml(doc) do
     new(
-      xml_one_value(doc, "address"),
-      xml_one_value(doc, "city"),
-      xml_one_value(doc, "state"),
-      xml_one_value(doc, "zip"),
-      xml_one_value(doc, "country"),
-      xml_one_value(doc, "phoneNumber"),
-      xml_one_value(doc, "faxNumber")
+      xml_one_value(doc, "//address"),
+      xml_one_value(doc, "//city"),
+      xml_one_value(doc, "//state"),
+      xml_one_value(doc, "//zip"),
+      xml_one_value(doc, "//country"),
+      xml_one_value(doc, "//phoneNumber"),
+      xml_one_value(doc, "//faxNumber")
     )
   end
 end

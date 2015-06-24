@@ -4,10 +4,12 @@ defmodule AuthorizeNet.Customer do
   """
   use AuthorizeNet.Helper.XML
   alias AuthorizeNet, as: Main
+  alias AuthorizeNet.PaymentProfile, as: PaymentProfile
   defstruct description: nil,
     email: nil,
     id: nil,
-    profile_id: nil
+    profile_id: nil,
+    payment_profiles: []
 
   @type t :: %AuthorizeNet.Customer{}
 
@@ -79,14 +81,15 @@ defmodule AuthorizeNet.Customer do
   end
 
   @spec new(
-    String.t, Integer, String.t, String.t
+    String.t, Integer, String.t, String.t, [PaymentProfile.t]
   ) :: AuthorizeNet.Customer.t
-  defp new(id, profile_id, description, email) do
+  defp new(id, profile_id, description, email, payment_profiles \\ []) do
     %AuthorizeNet.Customer{
       id: id,
       description: description,
       email: email,
-      profile_id: profile_id
+      profile_id: profile_id,
+      payment_profiles: payment_profiles
     }
   end
 
@@ -100,7 +103,7 @@ defmodule AuthorizeNet.Customer do
   end
 
   @doc """
-  Builds an Address from an xmlElement record.
+  Builds an Customer from an xmlElement record.
   """
   @spec from_xml(Record) :: AuthorizeNet.Customer.t
   def from_xml(doc) do
@@ -110,11 +113,15 @@ defmodule AuthorizeNet.Customer do
        {profile_id, ""} = Integer.parse profile_id
        profile_id
     end
+    payment_profiles = for p <- xml_find(doc, "//paymentProfiles") do
+      PaymentProfile.from_xml p, profile_id
+    end
     new(
       xml_one_value(doc, "//merchantCustomerId"),
       profile_id,
       xml_one_value(doc, "//description"),
-      xml_one_value(doc, "//email")
+      xml_one_value(doc, "//email"),
+      payment_profiles
     )
   end
 end
