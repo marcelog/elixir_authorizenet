@@ -395,6 +395,34 @@ defmodule AuthorizeNetTest do
       end
   end
 
+  test "can get payment profile" do
+    address = AuthorizeNet.Address.new(
+      "street", "city", "state", "zip", "country", "phone", "fax"
+    )
+    card = AuthorizeNet.Card.new "XXXX0015", "XXXX", nil
+
+    request_assert "get_payment_profile", "getCustomerPaymentProfileRequest",
+      fn() -> AuthorizeNet.PaymentProfile.get 35947873, 32500939 end,
+      fn(body, msgs) ->
+        assert_fields body, msgs, [
+          {"customerProfileId", "35947873"},
+          {"customerPaymentProfileId", "32500939"}
+        ]
+      end,
+      fn(result) ->
+        assert %AuthorizeNet.PaymentProfile{
+          profile_id: 32500939,
+          customer_id: 35947873,
+          address: address,
+          type: :individual,
+          payment_type: card,
+          company: "company",
+          first_name: "first_name",
+          last_name: "last_name"
+        } === result
+      end
+  end
+
   defp assert_fields(xml, msgs, fields) do
     Enum.reduce fields, msgs, fn({k, v}, acc) ->
       if xml_value(xml, "//#{k}") === [v] do

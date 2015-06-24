@@ -17,8 +17,23 @@ defmodule AuthorizeNet.PaymentProfile do
     payment_type: nil,
     profile_id: nil
 
+  @profile_type [
+    individual: "individual",
+    business: "business"
+  ]
+
   @type t :: %AuthorizeNet.PaymentProfile{}
   @type payment_type :: BankAccount.t | Card.t
+  @type profile_type :: :individual | :business
+
+  @spec get(Integer, Integer) :: AuthorizeNet.PaymentProfile.t
+  def get(customer_id, profile_id) do
+    doc = Main.req :getCustomerPaymentProfileRequest, [
+      customerProfileId: customer_id,
+      customerPaymentProfileId: profile_id
+    ]
+    from_xml doc, customer_id
+  end
 
   @doc """
   Creates a payment profile for an "invidual".
@@ -123,6 +138,14 @@ defmodule AuthorizeNet.PaymentProfile do
   """
   @spec from_xml(Record, Integer) :: AuthorizeNet.PaymentProfile.t
   def from_xml(doc, customer_id \\ nil) do
+    type = case xml_one_value(doc, "//customerType") do
+      nil -> nil
+      type ->
+        [{type, _}] = Enum.filter @profile_type, fn({_k, v}) ->
+          v === type
+        end
+        type
+    end
     payment = case xml_find doc, "//creditCard" do
       [] -> BankAccount.from_xml doc
       _ -> Card.from_xml doc
@@ -131,10 +154,11 @@ defmodule AuthorizeNet.PaymentProfile do
       [] -> nil
       _ -> Address.from_xml doc
     end
+    {id, ""} = Integer.parse xml_one_value(doc, "//customerPaymentProfileId")
     new(
-      xml_one_value(doc, "//customerType"),
+      type,
       customer_id,
-      xml_one_value(doc, "//customerPaymentProfileId"),
+      id,
       xml_one_value(doc, "//firstName"),
       xml_one_value(doc, "//lastName"),
       xml_one_value(doc, "//company"),

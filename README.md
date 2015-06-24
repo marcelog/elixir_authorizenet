@@ -59,7 +59,34 @@ This is WIP.
    payment_type: %AuthorizeNet.Card{code: "900", expiration_date: "2015-08",
     number: "5424000000000015"}, profile_id: 32500939, type: :individual}
 ```
-You can also call `AuthorizeNet.PaymentProfile.create_business` to create a "business" associated payment profile.
+
+### Creating a bank account
+```elixir
+  > address = AuthorizeNet.Address.new "street", "city", "state", "zip", "country", "phone", "fax"
+  %AuthorizeNet.Address{address: "street", city: "city", country: "country",
+   fax: "fax", phone: "phone", state: "state", zip: "zip"}
+
+  > account = AuthorizeNet.BankAccount.savings "bank_name", "routing_number", "account_number", "name_on_account", :ccd
+  %AuthorizeNet.BankAccount{account_number: "account_number",
+   bank_name: "bank_name", echeck_type: :ccd, name_on_account: "name_on_account",
+   routing_number: "routing_number", type: :savings}
+
+  > AuthorizeNet.PaymentProfile.create_individual 35947873, "first_name", "last_name", "company", address, account
+```
+
+You can also call `AuthorizeNet.BankAccount.checking` and `AuthorizeNet.BankAccount.business_checking` to create a "checking" and "business checking" account respectively. The last argument is the type of
+[echeck](https://www.authorize.net/support/CNP/helpfiles/Miscellaneous/Pop-up_Terms/ALL/eCheck.Net_Type.htm).
+
+### Getting a payment profile
+```elixir
+  > AuthorizeNet.PaymentProfile.get 35947873, 32500939
+%AuthorizeNet.PaymentProfile{address: %AuthorizeNet.Address{address: "street",
+  city: "city", country: "country", fax: "fax", phone: "phone", state: "state",
+  zip: "zip"}, company: "company", customer_id: 35947873,
+ first_name: "first_name", last_name: "last_name",
+ payment_type: %AuthorizeNet.Card{code: nil, expiration_date: "XXXX",
+  number: "XXXX0015"}, profile_id: 32500939, type: :individual}
+```
 
 ## Errors
 
