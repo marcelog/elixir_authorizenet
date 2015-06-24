@@ -1,6 +1,11 @@
 :ok = Application.ensure_started :ranch
 :ok = Application.ensure_started :cowlib
 :ok = Application.ensure_started :cowboy
+:server_ports = :ets.new :server_ports, [
+  :named_table, :public, {:read_concurrency, true},
+  {:write_concurrency, false}
+]
+true = :ets.insert :server_ports, {:n, 10200}
 
 defmodule AuthorizeNet.Test.Util do
   @moduledoc """
@@ -51,38 +56,40 @@ defmodule AuthorizeNet.Test.Util do
         Application.put_env :authorize_net, key, value
       end
 
-      defp port() do
-        Application.get_env :authorize_net, :test_server_port
-      end
-
-      defp path() do
-        Application.get_env :authorize_net, :test_server_path
-      end
-
-      defp uri() do
-        Application.get_env :authorize_net, :test_server_uri
-      end
-
       defp set_test_uri() do
-        path = "/#{:base64.encode :erlang.term_to_binary(:erlang.make_ref)}"
+        port = :ets.update_counter :server_ports, :n, 1
+        path = "/#{Base.encode16 :erlang.term_to_binary(:erlang.make_ref)}"
         uri = "http://127.0.0.1:#{port}#{path}"
         set_config :test_server_uri, uri
         set_config :test_server_path, path
-        uri
+        {path, uri, port}
       end
 
       defp start_server(fun) do
-        set_test_uri
-        serve :authnet_dummy, :http, "127.0.0.1", port, 1, [], [
+        {path, uri, port} = set_test_uri
+        name = String.to_atom(
+          :base64.encode :erlang.term_to_binary(:erlang.make_ref)
+        )
+        serve name, :http, "127.0.0.1", port, 1, [], [
           post(path, fn(bindings, headers, body, req, state) ->
             fun.(bindings, headers, body, req, state)
           end)
         ]
+        name
       end
 
-      defp stop_server() do
-        unserve :authnet_dummy
-        :timer.sleep 100
+      defp stop_server(name) do
+        unserve name
+      end
+
+      defp assert_fields(xml, msgs, fields) do
+        Enum.reduce fields, msgs, fn({k, v}, acc) ->
+          if xml_value(xml, "//#{k}") === [v] do
+              acc
+          else
+            ["wrong #{k}"|acc]
+          end
+        end
       end
     end
   end

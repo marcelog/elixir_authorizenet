@@ -13,7 +13,7 @@ defmodule AuthorizeNetTest do
   See the License for the specific language governing permissions and
   limitations under the License.
   """
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   use Servito
   use AuthorizeNet.Test.Util
   use AuthorizeNet.Helper.XML
@@ -28,19 +28,19 @@ defmodule AuthorizeNetTest do
   end
 
   test "can raise request error on server issues" do
-    start_server fn(_bindings, _headers, _body, req, state) ->
+    name = start_server fn(_bindings, _headers, _body, req, state) ->
       ret 404, [], "blah"
     end
     assert_raise AuthorizeNet.Error.Connection, &AuthorizeNet.Customer.get_all/0
-    stop_server
+    stop_server name
   end
 
   test "can raise operation error on bad request" do
-    start_server fn(_bindings, _headers, _body, req, state) ->
+    name = start_server fn(_bindings, _headers, _body, req, state) ->
       serve_file "bad_auth"
     end
     assert_raise AuthorizeNet.Error.Operation, &AuthorizeNet.Customer.get_all/0
-    stop_server
+    stop_server name
   end
 
   test "can send credentials" do
@@ -84,7 +84,7 @@ defmodule AuthorizeNetTest do
   end
 
   test "cant get inexistant profile" do
-    start_server fn(_bindings, _headers, _body, req, state) ->
+    name = start_server fn(_bindings, _headers, _body, req, state) ->
       serve_file "get_inexistant_customer_profile"
     end
     try do
@@ -94,7 +94,7 @@ defmodule AuthorizeNetTest do
       e in AuthorizeNet.Error.Operation ->
         assert e.message === [{"E00040", "The record cannot be found."}]
     end
-    stop_server
+    stop_server name
   end
 
   test "can create customer profile" do
@@ -120,7 +120,7 @@ defmodule AuthorizeNetTest do
   end
 
   test "cant create duplicated customer profile" do
-    start_server fn(_bindings, _headers, _body, req, state) ->
+    name = start_server fn(_bindings, _headers, _body, req, state) ->
       serve_file "create_duplicated_customer_profile"
     end
     try do
@@ -130,7 +130,7 @@ defmodule AuthorizeNetTest do
       e in AuthorizeNet.Error.Operation ->
         assert e.message === [{"E00039", "A duplicate record with ID 35938239 already exists."}]
     end
-    stop_server
+    stop_server name
   end
 
   test "can update customer profile" do
@@ -468,21 +468,11 @@ defmodule AuthorizeNetTest do
       end
   end
 
-  defp assert_fields(xml, msgs, fields) do
-    Enum.reduce fields, msgs, fn({k, v}, acc) ->
-      if xml_value(xml, "//#{k}") === [v] do
-          acc
-      else
-        ["wrong #{k}"|acc]
-      end
-    end
-  end
-
   defp request_assert(
     file, request_type, request_fun, server_asserts_fun, client_asserts_fun
   ) do
     me = self
-    start_server fn(_bindings, _headers, body, req, state) ->
+    server_name = start_server fn(_bindings, _headers, body, req, state) ->
       msgs = []
       msgs = case validate body do
         {:error, error} -> ["invalid schema: #{inspect error}"|msgs]
@@ -498,7 +488,7 @@ defmodule AuthorizeNetTest do
       serve_file file
     end
     result = request_fun.()
-    stop_server
+    stop_server server_name
     receive do
       [] -> client_asserts_fun.(result)
       x -> flunk "Something went wrong with the request: #{inspect x}"
