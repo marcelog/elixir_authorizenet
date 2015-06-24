@@ -11,7 +11,11 @@ defmodule AuthorizeNet do
 
   @spec req(Atom, Keyword.t) :: Record | no_return
   def req(requestType, parameters) do
-    body = [{requestType, [{:merchantAuthentication, auth}|parameters]}]
+    body = [{
+      requestType,
+      %{xmlns: "AnetApi/xml/v1/schema/AnetApiSchema.xsd"},
+      [{:merchantAuthentication, auth}|parameters]
+    }]
     case Http.req :post, uri, body do
       {:ok, 200, _headers, <<0xEF, 0xBB, 0xBF, body :: binary>>} ->
         {doc, _} = Exmerl.from_string body

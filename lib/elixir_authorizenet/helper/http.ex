@@ -45,15 +45,21 @@ defmodule AuthorizeNet.Helper.Http do
     Enum.reverse acc
   end
 
+  defp format_xml([{k, a, v}|rest], acc) do
+    v = if is_list(v) do
+      format_xml v
+    else
+      v
+    end
+    format_xml rest, [{k, a, v}|acc]
+  end
+
   defp format_xml([{k, v}|rest], acc) do
     v = if is_list(v) do
       format_xml v
     else
       v
     end
-    format_xml rest, [
-      {k, %{xmlns: "AnetApi/xml/v1/schema/AnetApiSchema.xsd"}, v}
-      |acc
-    ]
+    format_xml rest, [{k, %{}, v}|acc]
   end
 end
