@@ -512,6 +512,30 @@ defmodule AuthorizeNetTest do
       end
   end
 
+  test "can get shipping address" do
+    request_assert "get_shipping_address", "getCustomerShippingAddressRequest",
+      fn() -> AuthorizeNet.Customer.get_shipping_address 35947873, 34065443 end,
+      fn(body, msgs) ->
+        assert_fields body, msgs, [
+          {"customerProfileId", "35947873"},
+          {"customerAddressId", "34065443"},
+        ]
+      end,
+      fn(result) ->
+        assert %AuthorizeNet.Address{
+          customer_id: 35947873,
+          id: 34065443,
+          country: "country",
+          zip: "zip",
+          phone: "phone",
+          fax: "fax",
+          address: "street",
+          city: "city",
+          state: "state"
+        } === result
+      end
+  end
+
   defp request_assert(
     file, request_type, request_fun, server_asserts_fun, client_asserts_fun
   ) do

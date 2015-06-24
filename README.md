@@ -56,9 +56,20 @@ Then run mix deps.get to install it.
   :ok
 ```
 
-### Creating a Shipping Address
+----
+## Shipping Addresses
+
+### Creating
 ```elixir
   > AuthorizeNet.Customer.create_shipping_address 35947873, address
+  %AuthorizeNet.Address{address: "street", city: "city", country: "country",
+   customer_id: 35947873, fax: "fax", id: 34065443, phone: "phone",
+   state: "state", zip: "zip"}
+```
+
+### Getting
+```elixir
+  > AuthorizeNet.Customer.get_shipping_address 35947873, 34065443
   %AuthorizeNet.Address{address: "street", city: "city", country: "country",
    customer_id: 35947873, fax: "fax", id: 34065443, phone: "phone",
    state: "state", zip: "zip"}

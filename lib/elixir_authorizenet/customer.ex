@@ -32,7 +32,7 @@ defmodule AuthorizeNet.Customer do
   Creates a shipping address for the customer. See:
   http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-create-customer-shipping-address
   """
-  @spec create_shipping_address(Integer, Address.t) :: Address.t
+  @spec create_shipping_address(Integer, Address.t) :: Address.t | no_return
   def create_shipping_address(profile_id, address) do
     doc = Main.req :createCustomerShippingAddressRequest, [
       customerProfileId: profile_id,
@@ -41,6 +41,19 @@ defmodule AuthorizeNet.Customer do
    [address_id] = xml_value doc, "//customerAddressId"
    {address_id, ""} = Integer.parse address_id
    %AuthorizeNet.Address{address | id: address_id, customer_id: profile_id}
+  end
+
+  @doc """
+  Returns a shipping address. See:
+  http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-get-customer-shipping-address
+  """
+  @spec get_shipping_address(Integer, Integer) :: Address.t | no_return
+  def get_shipping_address(profile_id, address_id) do
+    doc = Main.req :getCustomerShippingAddressRequest, [
+      customerProfileId: profile_id,
+      customerAddressId: address_id
+    ]
+    Address.from_xml doc, profile_id
   end
 
   @doc """
