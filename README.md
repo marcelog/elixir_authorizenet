@@ -101,6 +101,11 @@ Make sure you have an `AuthorizeNet.Address` struct with customer_id and id alre
    state: "state", zip: "zip2"}
 ```
 
+### Deleting
+```elixir
+  > AuthorizeNet.Customer.delete_shipping_address 35962612, 34066037
+  :ok
+```
 ----
 
 ## Customer Payment Profiles

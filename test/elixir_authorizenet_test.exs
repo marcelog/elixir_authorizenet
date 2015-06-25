@@ -560,6 +560,18 @@ defmodule AuthorizeNetTest do
       end
   end
 
+  test "can delete shipping address" do
+    request_assert "delete_shipping_address", "deleteCustomerShippingAddressRequest",
+      fn() -> AuthorizeNet.Customer.delete_shipping_address 35962612, 34066037  end,
+      fn(body, msgs) ->
+        assert_fields body, msgs, [
+          {"customerProfileId", "35962612"},
+          {"customerAddressId", "34066037"}
+        ]
+      end,
+      fn(result) -> assert :ok === result end
+  end
+
   defp request_assert(
     file, request_type, request_fun, server_asserts_fun, client_asserts_fun
   ) do

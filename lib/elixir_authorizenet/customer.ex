@@ -28,6 +28,23 @@ defmodule AuthorizeNet.Customer do
 
   @type t :: %AuthorizeNet.Customer{}
 
+  @doc """
+  Deletes a shipping address. See:
+  http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-delete-customer-shipping-address
+  """
+  @spec delete_shipping_address(Integer, Integer) :: :ok | no_return
+  def delete_shipping_address(customer_id, address_id) do
+    Main.req :deleteCustomerShippingAddressRequest, [
+      customerProfileId: customer_id,
+      customerAddressId: address_id
+    ]
+    :ok
+  end
+
+  @doc """
+  Updates a shipping address. See:
+  http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-update-customer-shipping-address
+  """
   @spec update_shipping_address(Address.t) :: AuthorizeNet.Address.t | no_return
   def update_shipping_address(address) do
     Main.req :updateCustomerShippingAddressRequest, [
@@ -42,14 +59,14 @@ defmodule AuthorizeNet.Customer do
   http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-create-customer-shipping-address
   """
   @spec create_shipping_address(Integer, Address.t) :: Address.t | no_return
-  def create_shipping_address(profile_id, address) do
+  def create_shipping_address(customer_id, address) do
     doc = Main.req :createCustomerShippingAddressRequest, [
-      customerProfileId: profile_id,
+      customerProfileId: customer_id,
       address: Address.to_xml(address)
     ]
    [address_id] = xml_value doc, "//customerAddressId"
    {address_id, ""} = Integer.parse address_id
-   %AuthorizeNet.Address{address | id: address_id, customer_id: profile_id}
+   %AuthorizeNet.Address{address | id: address_id, customer_id: customer_id}
   end
 
   @doc """
@@ -57,12 +74,12 @@ defmodule AuthorizeNet.Customer do
   http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-get-customer-shipping-address
   """
   @spec get_shipping_address(Integer, Integer) :: Address.t | no_return
-  def get_shipping_address(profile_id, address_id) do
+  def get_shipping_address(customer_id, address_id) do
     doc = Main.req :getCustomerShippingAddressRequest, [
-      customerProfileId: profile_id,
+      customerProfileId: customer_id,
       customerAddressId: address_id
     ]
-    Address.from_xml doc, profile_id
+    Address.from_xml doc, customer_id
   end
 
   @doc """
