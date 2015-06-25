@@ -24,6 +24,9 @@ defmodule AuthorizeNet.Address do
     phone: nil,
     fax: nil,
     id: nil,
+    first_name: nil,
+    last_name: nil,
+    company: nil,
     customer_id: nil
 
   @type t :: %AuthorizeNet.Address{}
@@ -32,10 +35,17 @@ defmodule AuthorizeNet.Address do
   Creates a new Address structure, used for billing and/or shipping.
   """
   @spec new(
-    String.t, String.t, String.t, String.t, String.t, String.t, String.t
+    String.t, String.t, String.t, String.t, String.t, String.t, String.t,
+    String.t, String.t, String.t
   ) :: AuthorizeNet.Address.t
-  def new(street_address, city, state, zip, country, phone, fax) do
+  def new(
+    first_name, last_name, company, street_address, city, state, zip,
+    country, phone, fax
+  ) do
     %AuthorizeNet.Address{
+      first_name: first_name,
+      last_name: last_name,
+      company: company,
       address: street_address,
       city: city,
       state: state,
@@ -53,13 +63,17 @@ defmodule AuthorizeNet.Address do
   @spec to_xml(AuthorizeNet.Address.t) :: Keyword.t
   def to_xml(address) do
     [
+      firstName: address.first_name,
+      lastName: address.last_name,
+      company: address.company,
       address: address.address,
       city: address.city,
       state: address.state,
       zip: address.zip,
       country: address.country,
       phoneNumber: address.phone,
-      faxNumber: address.fax
+      faxNumber: address.fax,
+      customerAddressId: address.id
     ]
   end
 
@@ -75,6 +89,9 @@ defmodule AuthorizeNet.Address do
        id
     end
     profile = new(
+      xml_one_value(doc, "//firstName"),
+      xml_one_value(doc, "//lastName"),
+      xml_one_value(doc, "//company"),
       xml_one_value(doc, "//address"),
       xml_one_value(doc, "//city"),
       xml_one_value(doc, "//state"),

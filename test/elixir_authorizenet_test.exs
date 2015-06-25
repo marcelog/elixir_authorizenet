@@ -169,15 +169,14 @@ defmodule AuthorizeNetTest do
 
   test "can create invidual credit card payment profile" do
     address = AuthorizeNet.Address.new(
-      "street", "city", "state", "zip", "country", "phone", "fax"
+      "first", "last", "company", "street", "city",
+      "state", "zip", "country", "phone", "fax"
     )
     card = AuthorizeNet.Card.new "5424000000000015", "2015-08", "900"
 
     request_assert "create_payment_profile", "createCustomerPaymentProfileRequest",
       fn() ->
-        AuthorizeNet.PaymentProfile.create_individual(
-          35938239, "first", "last", "company", address, card
-        )
+        AuthorizeNet.PaymentProfile.create_individual 35938239, address, card
       end,
       fn(body, msgs) ->
         assert_fields body, msgs, [
@@ -200,29 +199,25 @@ defmodule AuthorizeNetTest do
       end,
       fn(result) ->
         assert %AuthorizeNet.PaymentProfile{
-          profile_id: 32500845,
+          profile_id: 32510145,
           customer_id: 35938239,
           address: address,
           type: :individual,
-          payment_type: card,
-          company: "company",
-          first_name: "first",
-          last_name: "last"
+          payment_type: card
         } === result
       end
   end
 
   test "can create business credit card payment profile" do
     address = AuthorizeNet.Address.new(
-      "street", "city", "state", "zip", "country", "phone", "fax"
+      "first", "last", "company", "street", "city",
+      "state", "zip", "country", "phone", "fax"
     )
     card = AuthorizeNet.Card.new "5424000000000015", "2015-08", "900"
 
     request_assert "create_payment_profile", "createCustomerPaymentProfileRequest",
       fn() ->
-        AuthorizeNet.PaymentProfile.create_business(
-          35938239, "first", "last", "company", address, card
-        )
+        AuthorizeNet.PaymentProfile.create_business 35938239, address, card
       end,
       fn(body, msgs) ->
         assert_fields body, msgs, [
@@ -245,14 +240,11 @@ defmodule AuthorizeNetTest do
       end,
       fn(result) ->
         assert %AuthorizeNet.PaymentProfile{
-          profile_id: 32500845,
+          profile_id: 32510145,
           customer_id: 35938239,
           address: address,
           type: :business,
-          payment_type: card,
-          company: "company",
-          first_name: "first",
-          last_name: "last"
+          payment_type: card
         } === result
       end
   end
@@ -267,7 +259,8 @@ defmodule AuthorizeNetTest do
 
   test "can create savings bank account payment profile" do
     address = AuthorizeNet.Address.new(
-      "street", "city", "state", "zip", "country", "phone", "fax"
+      "first", "last", "company", "street", "city",
+      "state", "zip", "country", "phone", "fax"
     )
     account = AuthorizeNet.BankAccount.savings(
       "bank", "111", "222", "name", :ccd
@@ -275,9 +268,7 @@ defmodule AuthorizeNetTest do
 
     request_assert "create_payment_profile", "createCustomerPaymentProfileRequest",
       fn() ->
-        AuthorizeNet.PaymentProfile.create_individual(
-          35938239, "first", "last", "company", address, account
-        )
+        AuthorizeNet.PaymentProfile.create_individual 35938239, address, account
       end,
       fn(body, msgs) ->
         assert_fields body, msgs, [
@@ -301,31 +292,29 @@ defmodule AuthorizeNetTest do
       end,
       fn(result) ->
         assert %AuthorizeNet.PaymentProfile{
-          profile_id: 32500845,
+          profile_id: 32510145,
           customer_id: 35938239,
           address: address,
           type: :individual,
-          payment_type: account,
-          company: "company",
-          first_name: "first",
-          last_name: "last"
+          payment_type: account
         } === result
       end
   end
 
   test "can create checking bank account payment profile" do
     address = AuthorizeNet.Address.new(
-      "street", "city", "state", "zip", "country", "phone", "fax"
+      "first", "last", "company", "street", "city",
+      "state", "zip", "country", "phone", "fax"
     )
     account = AuthorizeNet.BankAccount.checking(
       "bank", "111", "222", "name", :web
     )
 
-    request_assert "create_payment_profile", "createCustomerPaymentProfileRequest",
+    request_assert(
+      "create_bank_account_payment_profile",
+      "createCustomerPaymentProfileRequest",
       fn() ->
-        AuthorizeNet.PaymentProfile.create_individual(
-          35938239, "first", "last", "company", address, account
-        )
+        AuthorizeNet.PaymentProfile.create_individual 35938239, address, account
       end,
       fn(body, msgs) ->
         assert_fields body, msgs, [
@@ -349,21 +338,19 @@ defmodule AuthorizeNetTest do
       end,
       fn(result) ->
         assert %AuthorizeNet.PaymentProfile{
-          profile_id: 32500845,
+          profile_id: 32510152,
           customer_id: 35938239,
           address: address,
           type: :individual,
-          payment_type: account,
-          company: "company",
-          first_name: "first",
-          last_name: "last"
+          payment_type: account
         } === result
-      end
+      end)
   end
 
   test "can create business checking bank account payment profile" do
     address = AuthorizeNet.Address.new(
-      "street", "city", "state", "zip", "country", "phone", "fax"
+      "first", "last", "company", "street", "city",
+      "state", "zip", "country", "phone", "fax"
     )
     account = AuthorizeNet.BankAccount.business_checking(
       "bank", "111", "222", "name", :ppd
@@ -371,9 +358,7 @@ defmodule AuthorizeNetTest do
 
     request_assert "create_payment_profile", "createCustomerPaymentProfileRequest",
       fn() ->
-        AuthorizeNet.PaymentProfile.create_individual(
-          35938239, "first", "last", "company", address, account
-        )
+        AuthorizeNet.PaymentProfile.create_individual 35938239, address, account
       end,
       fn(body, msgs) ->
         assert_fields body, msgs, [
@@ -397,42 +382,37 @@ defmodule AuthorizeNetTest do
       end,
       fn(result) ->
         assert %AuthorizeNet.PaymentProfile{
-          profile_id: 32500845,
+          profile_id: 32510145,
           customer_id: 35938239,
           address: address,
           type: :individual,
-          payment_type: account,
-          company: "company",
-          first_name: "first",
-          last_name: "last"
+          payment_type: account
         } === result
       end
   end
 
   test "can get payment profile" do
     address = AuthorizeNet.Address.new(
-      "street", "city", "state", "zip", "country", "phone", "fax"
+      "first", "last", "company", "street", "city",
+      "state", "zip", "country", "phone", "fax"
     )
     card = AuthorizeNet.Card.new "XXXX0015", "XXXX", nil
 
     request_assert "get_payment_profile", "getCustomerPaymentProfileRequest",
-      fn() -> AuthorizeNet.PaymentProfile.get 35947873, 32500939 end,
+      fn() -> AuthorizeNet.PaymentProfile.get 35947873, 32510145 end,
       fn(body, msgs) ->
         assert_fields body, msgs, [
           {"customerProfileId", "35947873"},
-          {"customerPaymentProfileId", "32500939"}
+          {"customerPaymentProfileId", "32510145"}
         ]
       end,
       fn(result) ->
         assert %AuthorizeNet.PaymentProfile{
-          profile_id: 32500939,
+          profile_id: 32510145,
           customer_id: 35947873,
           address: address,
           type: :individual,
-          payment_type: card,
-          company: "company",
-          first_name: "first_name",
-          last_name: "last_name"
+          payment_type: card
         } === result
       end
   end
@@ -482,7 +462,8 @@ defmodule AuthorizeNetTest do
 
   test "can create shipping address" do
     address = AuthorizeNet.Address.new(
-      "street", "city", "state", "zip", "country", "phone", "fax"
+      "first", "last", "company", "street", "city",
+      "state", "zip", "country", "phone", "fax"
     )
     request_assert "create_shipping_address", "createCustomerShippingAddressRequest",
       fn() -> AuthorizeNet.Customer.create_shipping_address 35947873, address end,
@@ -500,7 +481,10 @@ defmodule AuthorizeNetTest do
       fn(result) ->
         assert %AuthorizeNet.Address{
           customer_id: 35947873,
-          id: 34065116,
+          id: 34066037,
+          first_name: "first",
+          last_name: "last",
+          company: "company",
           country: "country",
           zip: "zip",
           phone: "phone",
@@ -514,17 +498,20 @@ defmodule AuthorizeNetTest do
 
   test "can get shipping address" do
     request_assert "get_shipping_address", "getCustomerShippingAddressRequest",
-      fn() -> AuthorizeNet.Customer.get_shipping_address 35947873, 34065443 end,
+      fn() -> AuthorizeNet.Customer.get_shipping_address 35947873, 34066037 end,
       fn(body, msgs) ->
         assert_fields body, msgs, [
           {"customerProfileId", "35947873"},
-          {"customerAddressId", "34065443"},
+          {"customerAddressId", "34066037"},
         ]
       end,
       fn(result) ->
         assert %AuthorizeNet.Address{
           customer_id: 35947873,
-          id: 34065443,
+          id: 34066037,
+          first_name: "first",
+          last_name: "last",
+          company: "company",
           country: "country",
           zip: "zip",
           phone: "phone",

@@ -26,52 +26,66 @@ Then run mix deps.get to install it.
 ### Creating
 ```elixir
   > AuthorizeNet.Customer.create "merchantId", "description", "email@host.com"
-  %AuthorizeNet.Customer{profile_id: 35934704, id: "merchantId",
-   description: "description", email: "email@host.com", payment_profiles: []}
+  %AuthorizeNet.Customer{description: "description", email: "email@host.com",
+   id: "merchantId", payment_profiles: [], profile_id: 35962612,
+   shipping_addresses: []}
 ```
 
 ### Updating
 ```elixir
-  > AuthorizeNet.Customer.update 35934704, "merchantId", "description", "email2@host.com"
-  %AuthorizeNet.Customer{id: "merchantId", description: "description",
-   email: "email2@host.com", profile_id: 35934704, payment_profiles: []}
+  > AuthorizeNet.Customer.update 35962612, "merchantId", "description", "email2@host.com"
+  %AuthorizeNet.Customer{description: "description", email: "email2@host.com",
+   id: "merchantId", payment_profiles: [], profile_id: 35962612,
+   shipping_addresses: []}
 ```
 
 ### Get all IDs
 ```elixir
   > AuthorizeNet.Customer.get_all
-  [35934704]
+  [35962612]
 ```
 
 ### Get Customer Profile
 ```elixir
-  > AuthorizeNet.Customer.get 35934704
+  > AuthorizeNet.Customer.get 35962612
   %AuthorizeNet.Customer{description: "description", email: "email2@host.com",
-   id: "merchantId", profile_id: 35934704, payment_profiles: []}
+   id: "merchantId", payment_profiles: [], profile_id: 35962612,
+   shipping_addresses: []}
 ```
 
 ### Deleting
 ```elixir
-  > AuthorizeNet.Customer.delete 35934704
+  > AuthorizeNet.Customer.delete 35962612
   :ok
 ```
 
 ----
 ## Shipping Addresses
 
+First, create an address:
+
+```elixir
+  > address = AuthorizeNet.Address.new "first_name", "last_name", "company", "street", "city", "state", "zip", "country", "phone", "fax"
+  %AuthorizeNet.Address{address: "street", city: "city", company: "company",
+   country: "country", customer_id: nil, fax: "fax", first_name: "first_name",
+   id: nil, last_name: "last_name", phone: "phone", state: "state", zip: "zip"}
+```
+
 ### Creating
 ```elixir
-  > AuthorizeNet.Customer.create_shipping_address 35947873, address
-  %AuthorizeNet.Address{address: "street", city: "city", country: "country",
-   customer_id: 35947873, fax: "fax", id: 34065443, phone: "phone",
+  > AuthorizeNet.Customer.create_shipping_address 35962612, address
+  %AuthorizeNet.Address{address: "street", city: "city", company: "company",
+   country: "country", customer_id: 35962612, fax: "fax",
+   first_name: "first_name", id: 34066037, last_name: "last_name", phone: "phone",
    state: "state", zip: "zip"}
 ```
 
 ### Getting
 ```elixir
-  > AuthorizeNet.Customer.get_shipping_address 35947873, 34065443
-  %AuthorizeNet.Address{address: "street", city: "city", country: "country",
-   customer_id: 35947873, fax: "fax", id: 34065443, phone: "phone",
+  > AuthorizeNet.Customer.get_shipping_address 35962612, 34066037
+  %AuthorizeNet.Address{address: "street", city: "city", company: "company",
+   country: "country", customer_id: 35962612, fax: "fax",
+   first_name: "first_name", id: 34066037, last_name: "last_name", phone: "phone",
    state: "state", zip: "zip"}
 ```
 ----
@@ -86,9 +100,10 @@ Payment profiles can be created with the functions:
 To create a Payment Profile, you first need to create a billing address:
 
 ```elixir
-  > address = AuthorizeNet.Address.new "street", "city", "state", "zip", "country", "phone", "fax"
-  %AuthorizeNet.Address{address: "street", city: "city", country: "country",
-   fax: "fax", phone: "phone", state: "state", zip: "zip"}
+  > address = AuthorizeNet.Address.new "first_name", "last_name", "company", "street", "city", "state", "zip", "country", "phone", "fax"
+  %AuthorizeNet.Address{address: "street", city: "city", company: "company",
+   country: "country", customer_id: nil, fax: "fax", first_name: "first_name",
+   id: nil, last_name: "last_name", phone: "phone", state: "state", zip: "zip"}
 ```
 
 Then:
@@ -99,13 +114,13 @@ Then:
   %AuthorizeNet.Card{code: "900", expiration_date: "2015-08",
    number: "5424000000000015"}
 
-  > AuthorizeNet.PaymentProfile.create_individual 35947873, "first_name", "last_name", "company", address, card
+  > AuthorizeNet.PaymentProfile.create_individual 35962612, address, card
   %AuthorizeNet.PaymentProfile{address: %AuthorizeNet.Address{address: "street",
-    city: "city", country: "country", fax: "fax", phone: "phone", state: "state",
-    zip: "zip"}, company: "company", customer_id: 35947873,
-   first_name: "first_name", last_name: "last_name",
+    city: "city", company: "company", country: "country", customer_id: nil,
+    fax: "fax", first_name: "first_name", id: nil, last_name: "last_name",
+    phone: "phone", state: "state", zip: "zip"}, customer_id: 35962612,
    payment_type: %AuthorizeNet.Card{code: "900", expiration_date: "2015-08",
-    number: "5424000000000015"}, profile_id: 32500939, type: :individual}
+    number: "5424000000000015"}, profile_id: 32510145, type: :individual}
 ```
 
 ### Creating a bank account
@@ -121,35 +136,45 @@ Bank accounts can be created via 3 functions:
    bank_name: "bank_name", echeck_type: :ccd, name_on_account: "name_on_account",
    routing_number: "routing_number", type: :savings}
 
-  > AuthorizeNet.PaymentProfile.create_individual 35947873, "first_name", "last_name", "company", address, account
+  > AuthorizeNet.PaymentProfile.create_individual 35962612, address, account
+  %AuthorizeNet.PaymentProfile{address: %AuthorizeNet.Address{address: "street",
+    city: "city", company: "company", country: "country", customer_id: nil,
+    fax: "fax", first_name: "first_name", id: nil, last_name: "last_name",
+    phone: "phone", state: "state", zip: "zip"}, customer_id: 35962612,
+   payment_type: %AuthorizeNet.BankAccount{account_number: "account_number",
+    bank_name: "bank_name", echeck_type: :web, name_on_account: "name_on_account",
+    routing_number: "routing_number", type: :savings}, profile_id: 32510152,
+   type: :individual}
 ```
 
 The last argument is the type of [echeck](https://www.authorize.net/support/CNP/helpfiles/Miscellaneous/Pop-up_Terms/ALL/eCheck.Net_Type.htm).
 
 ### Getting a payment profile
 ```elixir
-  > AuthorizeNet.PaymentProfile.get 35947873, 32500939
-%AuthorizeNet.PaymentProfile{address: %AuthorizeNet.Address{address: "street",
-  city: "city", country: "country", fax: "fax", phone: "phone", state: "state",
-  zip: "zip"}, company: "company", customer_id: 35947873,
- first_name: "first_name", last_name: "last_name",
- payment_type: %AuthorizeNet.Card{code: nil, expiration_date: "XXXX",
-  number: "XXXX0015"}, profile_id: 32500939, type: :individual}
+  > AuthorizeNet.PaymentProfile.get 35962612, 32510152
+  %AuthorizeNet.PaymentProfile{address: %AuthorizeNet.Address{address: "street",
+    city: "city", company: "company", country: "country", customer_id: nil,
+    fax: "fax", first_name: "first_name", id: nil, last_name: "last_name",
+    phone: "phone", state: "state", zip: "zip"}, customer_id: 35962612,
+   payment_type: %AuthorizeNet.BankAccount{account_number: "XXXX0999",
+    bank_name: "bank_name", echeck_type: :web, name_on_account: "name_on_account",
+    routing_number: "XXXX3093", type: :savings}, profile_id: 32510152,
+   type: :individual}
 ```
 
 ### Validating
 ```elixir
-  > AuthorizeNet.PaymentProfile.valid? 35947873, 32500939
+  > AuthorizeNet.PaymentProfile.valid? 35962612, 32510145
   {false,
    %AuthorizeNet.Error.Operation{message: [{"E00027", "Card Code is required."}]}}
 
-  > AuthorizeNet.PaymentProfile.valid? 35947873, 32500939, "900"
+  > AuthorizeNet.PaymentProfile.valid? 35962612, 32510145, "900"
   true
 ```
 
 ### Deleting
 ```elixir
-  > AuthorizeNet.PaymentProfile.delete 35947873, 32500879
+  > AuthorizeNet.PaymentProfile.delete 35962612, 32510145
   :ok
 ```
 
@@ -169,7 +194,9 @@ These errors might be raised by the API calls:
 The source code is released under Apache 2 License.
 
 ## TODO
- * Add support for updating a payment profile.
+ * Add support for [updating a payment profile](http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-update-customer-profile).
  * Allow payment profiles when creating a customer profile.
+ * Add support for [hosted profile page](http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-get-hosted-profile-page).
+ * Add support for [creating a customer profile from a successful transaction](http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-create-a-customer-profile-from-a-transaction).
 
 Check [LICENSE](https://github.com/marcelog/elixir_authorizenet/blob/master/LICENSE) file for more information.

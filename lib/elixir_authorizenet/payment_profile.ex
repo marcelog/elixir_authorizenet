@@ -21,10 +21,7 @@ defmodule AuthorizeNet.PaymentProfile do
   alias AuthorizeNet.BankAccount, as: BankAccount
   alias AuthorizeNet, as: Main
 
-  defstruct first_name: nil,
-    last_name: nil,
-    company: nil,
-    address: nil,
+  defstruct address: nil,
     customer_id: nil,
     type: nil,
     payment_type: nil,
@@ -89,16 +86,10 @@ defmodule AuthorizeNet.PaymentProfile do
   http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-create-customer-payment-profile
   """
   @spec create_individual(
-    Integer, String.t, String.t, String.t, Address.t,
-    AuthorizeNet.PaymentProfile.payment_type
+    Integer, AuthorizeNet.Address.t, AuthorizeNet.PaymentProfile.payment_type
   ) :: AuthorizeNet.PaymentProfile.t | no_return
-  def create_individual(
-    customer_id, first_name, last_name, company, address, payment_type
-  ) do
-    create(
-      :individual, customer_id, nil, first_name, last_name,
-      company, address, payment_type
-    )
+  def create_individual(customer_id, address, payment_type) do
+    create :individual, customer_id, nil, address, payment_type
   end
 
   @doc """
@@ -106,30 +97,18 @@ defmodule AuthorizeNet.PaymentProfile do
   http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-create-customer-payment-profile
   """
   @spec create_business(
-    Integer, String.t, String.t, String.t, Address.t,
-    AuthorizeNet.PaymentProfile.payment_type
+    Integer, Address.t, AuthorizeNet.PaymentProfile.payment_type
   )  :: AuthorizeNet.PaymentProfile.t | no_return
-  def create_business(
-    customer_id, first_name, last_name, company, address, payment_type
-  ) do
-    create(
-      :business, customer_id, nil, first_name, last_name,
-      company, address, payment_type
-    )
+  def create_business(customer_id, address, payment_type) do
+    create :business, customer_id, nil, address, payment_type
   end
 
   @spec create(
-    String.t, Integer, Integer, String.t, String.t, Address.t,
+    String.t, Integer, Integer,
     Address.t, AuthorizeNet.PaymentProfile.payment_type
   ) :: AuthorizeNet.PaymentProfile.t | no_return
-  defp create(
-    type, customer_id, profile_id, first_name, last_name,
-    company, address, payment_type
-  ) do
-    profile = new(
-      type, customer_id, profile_id, first_name, last_name,
-      company, address, payment_type
-    )
+  defp create(type, customer_id, profile_id, address, payment_type) do
+    profile = new type, customer_id, profile_id, address, payment_type
     xml = to_xml profile
     doc = Main.req :createCustomerPaymentProfileRequest, xml
     [profile_id] = xml_value doc, "//customerPaymentProfileId"
@@ -138,13 +117,10 @@ defmodule AuthorizeNet.PaymentProfile do
   end
 
   @spec new(
-    String.t, Integer, Integer, String.t, String.t, Address.t,
+    String.t, Integer, Integer,
     Address.t, AuthorizeNet.PaymentProfile.payment_type
   ) :: AuthorizeNet.PaymentProfile.t | no_return
-  defp new(
-    type, customer_id, profile_id, first_name, last_name, company,
-    address, payment_type
-  ) do
+  defp new(type, customer_id, profile_id, address, payment_type) do
     case payment_type do
       %BankAccount{} -> :ok
       %Card{} -> :ok
@@ -153,9 +129,6 @@ defmodule AuthorizeNet.PaymentProfile do
     end
     %AuthorizeNet.PaymentProfile{
       type: type,
-      first_name: first_name,
-      last_name: last_name,
-      company: company,
       address: address,
       customer_id: customer_id,
       payment_type: payment_type,
@@ -164,11 +137,6 @@ defmodule AuthorizeNet.PaymentProfile do
   end
 
   defp to_xml(profile) do
-    bill_to = [
-      firstName: profile.first_name,
-      lastName: profile.last_name,
-      company: profile.company,
-    ] ++ Address.to_xml(profile.address)
     payment = case profile.payment_type do
       %BankAccount{} -> BankAccount.to_xml profile.payment_type
       %Card{} -> Card.to_xml profile.payment_type
@@ -177,7 +145,7 @@ defmodule AuthorizeNet.PaymentProfile do
       customerProfileId: profile.customer_id,
       paymentProfile: [
         customerType: profile.type,
-        billTo: bill_to,
+        billTo: Address.to_xml(profile.address),
         payment: payment
       ],
       validationMode: Main.validation_mode
@@ -210,9 +178,6 @@ defmodule AuthorizeNet.PaymentProfile do
       type,
       customer_id,
       id,
-      xml_one_value(doc, "//firstName"),
-      xml_one_value(doc, "//lastName"),
-      xml_one_value(doc, "//company"),
       address,
       payment
     )

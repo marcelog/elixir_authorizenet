@@ -28,6 +28,17 @@ defmodule AuthorizeNet.Customer do
 
   @type t :: %AuthorizeNet.Customer{}
 
+  #@spec update_shipping_address(Address.t) :: AuthorizeNet.Address.t | no_return
+  #def update_shipping_address(address) do
+  #  doc = Main.req :updateCustomerShippingAddressRequest, [
+  #    customerProfileId: profile_id,
+  #    address: Address.to_xml(address)
+  #  ]
+  # [address_id] = xml_value doc, "//customerAddressId"
+  # {address_id, ""} = Integer.parse address_id
+  # %AuthorizeNet.Address{address | id: address_id, customer_id: profile_id}
+  #end
+
   @doc """
   Creates a shipping address for the customer. See:
   http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-create-customer-shipping-address
