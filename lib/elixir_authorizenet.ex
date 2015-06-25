@@ -48,7 +48,7 @@ defmodule AuthorizeNet do
         if result === "Error" do
           codes = xml_value doc, "//code"
           texts = xml_value doc, "//text"
-          raise OperationError, message: Enum.zip(codes, texts)
+          raise OperationError, message: {Enum.zip(codes, texts), doc}
         end
         doc
       {:ok, status, headers, body} ->

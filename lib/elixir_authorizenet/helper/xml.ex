@@ -45,6 +45,17 @@ defmodule AuthorizeNet.Helper.XML do
     end
   end
 
+  defmacro xml_one_value_int(doc, element) do
+    quote [location: :keep] do
+      case xml_one_value(unquote(doc), unquote(element)) do
+        nil -> nil
+        code ->
+          {code, ""} = Integer.parse code
+          code
+      end
+    end
+  end
+
   defmacro xml_one_value(doc, element) do
     quote [location: :keep] do
       case xml_find unquote(doc), "#{unquote(element)}/text()" do

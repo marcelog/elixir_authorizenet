@@ -64,8 +64,7 @@ defmodule AuthorizeNet.Customer do
       customerProfileId: customer_id,
       address: Address.to_xml(address)
     ]
-   [address_id] = xml_value doc, "//customerAddressId"
-   {address_id, ""} = Integer.parse address_id
+   address_id = xml_one_value_int doc, "//customerAddressId"
    %AuthorizeNet.Address{address | id: address_id, customer_id: customer_id}
   end
 
@@ -137,8 +136,7 @@ defmodule AuthorizeNet.Customer do
       profile: profile_xml,
       validationMode: "none"
     ]
-   [profile_id] = xml_value doc, "//customerProfileId"
-   {profile_id, ""} = Integer.parse profile_id
+   profile_id = xml_one_value_int doc, "//customerProfileId"
    %AuthorizeNet.Customer{profile | profile_id: profile_id}
   end
 
@@ -185,12 +183,7 @@ defmodule AuthorizeNet.Customer do
   """
   @spec from_xml(Record) :: AuthorizeNet.Customer.t
   def from_xml(doc) do
-    profile_id = case xml_one_value doc, "//customerProfileId" do
-      nil -> nil
-      profile_id ->
-       {profile_id, ""} = Integer.parse profile_id
-       profile_id
-    end
+    profile_id = xml_one_value_int doc, "//customerProfileId"
     payment_profiles = for p <- xml_find(doc, "//paymentProfiles") do
       PaymentProfile.from_xml p, profile_id
     end

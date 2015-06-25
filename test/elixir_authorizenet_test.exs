@@ -92,7 +92,8 @@ defmodule AuthorizeNetTest do
       flunk "expected to fail"
     rescue
       e in AuthorizeNet.Error.Operation ->
-        assert e.message === [{"E00040", "The record cannot be found."}]
+        {codes, _} = e.message
+        assert codes === [{"E00040", "The record cannot be found."}]
     end
     stop_server name
   end
@@ -128,7 +129,8 @@ defmodule AuthorizeNetTest do
       flunk "expected to fail"
     rescue
       e in AuthorizeNet.Error.Operation ->
-        assert e.message === [{"E00039", "A duplicate record with ID 35938239 already exists."}]
+        {codes, _} = e.message
+        assert codes === [{"E00039", "A duplicate record with ID 35938239 already exists."}]
     end
     stop_server name
   end
@@ -441,10 +443,9 @@ defmodule AuthorizeNetTest do
         ]
       end,
       fn(result) ->
-        assert result === {
-          false,
-          %AuthorizeNet.Error.Operation{message: [{"E00027", "Card Code is required."}]}
-        }
+        {false, op} = result
+        {codes, _} = op.message
+        assert codes === [{"E00027", "Card Code is required."}]
       end
   end
 

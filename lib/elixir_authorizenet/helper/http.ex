@@ -67,15 +67,15 @@ defmodule AuthorizeNet.Helper.Http do
       {k, v} -> {k, %{}, v}
       {k, a, v} -> {k, a, v}
     end
-    case v do
-      nil -> format_xml rest, acc
-      _ ->
-        v = if is_list(v) do
-          format_xml v
-        else
-          v
-        end
-        format_xml rest, [{k, a, v}|acc]
+    if is_nil v do
+      format_xml rest, acc
+    else
+      v = if is_list v do
+        format_xml v
+      else
+        v
+      end
+      format_xml rest, [{k, a, v}|acc]
     end
   end
 end

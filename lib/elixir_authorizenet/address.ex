@@ -82,12 +82,7 @@ defmodule AuthorizeNet.Address do
   """
   @spec from_xml(Record, Integer) :: AuthorizeNet.Address.t
   def from_xml(doc, customer_id \\ nil) do
-    id = case xml_one_value(doc, "//customerAddressId") do
-      nil -> nil
-      id ->
-       {id, ""} = Integer.parse id
-       id
-    end
+    id = xml_one_value_int doc, "//customerAddressId"
     profile = new(
       xml_one_value(doc, "//firstName"),
       xml_one_value(doc, "//lastName"),

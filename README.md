@@ -198,6 +198,66 @@ The last argument is the type of [echeck](https://www.authorize.net/support/CNP/
 
 ----
 
+## Making transactions
+
+Let's see a crude example of **all** the things you can use and combine (be advised that this is a long example
+but you only need to use the combinations that suit your needs):
+
+```elixir
+
+# For the sake of simplicity, define an alias for the module, a credit card, and an address for shipping.
+alias AuthorizeNet.Transaction, as: T
+card = AuthorizeNet.Card.new "5424000000000015", "2015-08", "900"
+address = AuthorizeNet.Address.new(
+  "first_name",
+  "last_name",
+  "company",
+  "street",
+  "city",
+  "state",
+  "zip",
+  "country",
+  "phone",
+  "fax"
+)
+
+# Now let's see everything that we can set.
+T.new(3.00) |>
+T.auth_capture() |>          # or T.auth_only
+                             # or T.capture_only
+                             # or T.prior_auth_capture
+T.ref_transaction_id("0") |>
+T.enable_partial_auth |>     # or T.disable_partial_auth
+T.enable_duplicate_window |> # or T.disable_duplicate_window
+T.enable_test_request |>     # or T.disable_test_request
+T.employee_id(5678) |>
+T.market_retail |>           # or T.market_ecommerce or T.market_moto
+T.device_website |>          # or T.device_unknown or
+                             # or T.device_unattended_terminal
+                             # or T.device_electronic_cash_register
+                             # or T.device_personal_computer
+                             # or T.device_air_pay
+                             # or T.device_self_service_terminal
+                             # or T.device_wireless_pos
+                             # or T.device_dial_terminal
+                             # or T.device_virtual_terminal
+T.not_tax_exempt |>          # or T.tax_exempt
+T.tax("tax_name", "tax_description", 3.44) |>
+T.duty("duty_name", "duty_description", 3.44) |>
+T.bill_to(address) |>
+T.ship_to(address) |>
+T.shipping_cost("ship_cost", "ship_description", 3.44) |>
+T.user_fields(%{"key1": "value1", "key2": "value2"}) |>
+T.order("4455", "pepe") |>
+T.add_item(1, "item1", "itemdesc1", 1, 1.00) |>
+T.add_item(2, "item2", "itemdesc2", 1, 2.00) |>
+T.po_number("popo") |>
+T.pay_with_customer_profile(35962612, 32510145, 34066235, "900") |>  # or T.pay_with_card(card)
+                                                                     # or T.pay_with_apple_pay(data)
+T.customer_ip("127.0.0.1") |>
+T.run
+```
+----
 ## Errors
 
 These errors might be raised by the API calls:

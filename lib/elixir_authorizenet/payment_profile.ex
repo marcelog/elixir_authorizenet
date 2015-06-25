@@ -111,8 +111,7 @@ defmodule AuthorizeNet.PaymentProfile do
     profile = new type, customer_id, profile_id, address, payment_type
     xml = to_xml profile
     doc = Main.req :createCustomerPaymentProfileRequest, xml
-    [profile_id] = xml_value doc, "//customerPaymentProfileId"
-    {profile_id, ""} = Integer.parse profile_id
+    profile_id = xml_one_value_int doc, "//customerPaymentProfileId"
     %AuthorizeNet.PaymentProfile{profile | profile_id: profile_id}
   end
 
@@ -173,7 +172,7 @@ defmodule AuthorizeNet.PaymentProfile do
       [] -> nil
       _ -> Address.from_xml doc
     end
-    {id, ""} = Integer.parse xml_one_value(doc, "//customerPaymentProfileId")
+    id = xml_one_value_int doc, "//customerPaymentProfileId"
     new(
       type,
       customer_id,
