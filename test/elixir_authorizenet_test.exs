@@ -523,6 +523,43 @@ defmodule AuthorizeNetTest do
       end
   end
 
+  test "can update shipping address" do
+    address = AuthorizeNet.Address.new(
+      "first", "last", "company", "street", "city",
+      "state", "zip", "country", "phone", "fax"
+    )
+    address = %AuthorizeNet.Address{address | id: 1, customer_id: 2}
+    request_assert "update_shipping_address", "updateCustomerShippingAddressRequest",
+      fn() -> AuthorizeNet.Customer.update_shipping_address address end,
+      fn(body, msgs) ->
+        assert_fields body, msgs, [
+          {"customerProfileId", "2"},
+          {"country", "country"},
+          {"zip", "zip"},
+          {"state", "state"},
+          {"city", "city"},
+          {"phoneNumber", "phone"},
+          {"faxNumber", "fax"}
+        ]
+      end,
+      fn(result) ->
+        assert %AuthorizeNet.Address{
+          customer_id: 2,
+          id: 1,
+          first_name: "first",
+          last_name: "last",
+          company: "company",
+          country: "country",
+          zip: "zip",
+          phone: "phone",
+          fax: "fax",
+          address: "street",
+          city: "city",
+          state: "state"
+        } === result
+      end
+  end
+
   defp request_assert(
     file, request_type, request_fun, server_asserts_fun, client_asserts_fun
   ) do

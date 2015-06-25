@@ -88,6 +88,19 @@ First, create an address:
    first_name: "first_name", id: 34066037, last_name: "last_name", phone: "phone",
    state: "state", zip: "zip"}
 ```
+
+### Updating
+Make sure you have an `AuthorizeNet.Address` struct with customer_id and id already filled in
+(for example by getting it from the server). Then:
+
+```elixir
+  > AuthorizeNet.Customer.update_shipping_address address
+  %AuthorizeNet.Address{address: "street", city: "city", company: "company",
+   country: "country", customer_id: 35962612, fax: "fax",
+   first_name: "first_name", id: 34066235, last_name: "last_name", phone: "phone",
+   state: "state", zip: "zip2"}
+```
+
 ----
 
 ## Customer Payment Profiles
