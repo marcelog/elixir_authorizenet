@@ -238,7 +238,31 @@ T.run
 ```elixir
 T.new(10.25) |>
 T.auth_capture() |>
-T.pay_with_customer_profile(customer_profile_id, payment_profile_id, shipping_address_id, card_code) |>
+T.pay_with_customer_profile(
+  customer_profile_id,
+  payment_profile_id,
+  shipping_address_id,
+  card_code
+) |>
+T.order("4455", "order description") |>
+T.run
+```
+
+### Paying with Apple Pay
+```elixir
+T.new(10.25) |>
+T.auth_capture() |>
+T.pay_with_apple_pay(encrypted_data) |>
+T.order("4455", "order description") |>
+T.run
+```
+
+### Paying with a Bank Account
+```elixir
+T.new(10.25) |>
+T.bill_to(address) |>
+T.auth_capture() |>
+T.pay_with_bank_account(account) |>
 T.order("4455", "order description") |>
 T.run
 ```
