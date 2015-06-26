@@ -665,10 +665,154 @@ defmodule AuthorizeNetTest do
       fn(result) -> refute result.success end
   end
 
+  test "can disable settings in a transaction" do
+    request_assert "transaction", "createTransactionRequest",
+      fn() ->
+        alias AuthorizeNet.Transaction, as: T
+        T.new |>
+        T.auth_capture |>
+        T.disable_partial_auth |>
+        T.disable_duplicate_window |>
+        T.disable_test_request |>
+        T.disable_email_customer |>
+        T.disable_recurring_billing |>
+        T.run
+      end,
+      fn(body, msgs) ->
+        [s1, s2, s3, s4, s5] = xml_find body, "//setting"
+        assert_fields(s1, msgs, [
+          {"settingName", "allowPartialAuth"},
+          {"settingValue", "false"}
+        ])
+        assert_fields(s2, msgs, [
+          {"settingName", "duplicateWindow"},
+          {"settingValue", "false"}
+        ])
+        assert_fields(s3, msgs, [
+          {"settingName", "emailCustomer"},
+          {"settingValue", "false"}
+        ])
+        assert_fields(s4, msgs, [
+          {"settingName", "recurringBilling"},
+          {"settingValue", "false"}
+        ])
+        assert_fields(s5, msgs, [
+          {"settingName", "testRequest"},
+          {"settingValue", "false"}
+        ])
+      end,
+      fn(_result) -> true end
+  end
+
+  test "can enable settings in a transaction" do
+    request_assert "transaction", "createTransactionRequest",
+      fn() ->
+        alias AuthorizeNet.Transaction, as: T
+        T.new |>
+        T.auth_capture |>
+        T.enable_partial_auth |>
+        T.enable_duplicate_window |>
+        T.enable_test_request |>
+        T.enable_email_customer |>
+        T.enable_recurring_billing |>
+        T.run
+      end,
+      fn(body, msgs) ->
+        [s1, s2, s3, s4, s5] = xml_find body, "//setting"
+        assert_fields(s1, msgs, [
+          {"settingName", "allowPartialAuth"},
+          {"settingValue", "true"}
+        ])
+        assert_fields(s2, msgs, [
+          {"settingName", "duplicateWindow"},
+          {"settingValue", "true"}
+        ])
+        assert_fields(s3, msgs, [
+          {"settingName", "emailCustomer"},
+          {"settingValue", "true"}
+        ])
+        assert_fields(s4, msgs, [
+          {"settingName", "recurringBilling"},
+          {"settingValue", "true"}
+        ])
+        assert_fields(s5, msgs, [
+          {"settingName", "testRequest"},
+          {"settingValue", "true"}
+        ])
+      end,
+      fn(_result) -> true end
+  end
+
+  test "can pay a transaction with apple pay" do
+    request_assert "transaction", "createTransactionRequest",
+      fn() ->
+        alias AuthorizeNet.Transaction, as: T
+        T.new(3.03) |>
+        T.auth_capture |>
+        T.pay_with_apple_pay("443331") |>
+        T.run
+      end,
+      fn(body, msgs) ->
+        [o_data] = xml_find body, "//opaqueData"
+        assert_fields(o_data, msgs, [
+          {"dataDescriptor", "COMMON.APPLE.INAPP.PAYMENT"},
+          {"dataValue", "443331"}
+        ])
+      end,
+      fn(_result) -> true end
+  end
+
+  test "can pay a transaction with credit card" do
+    request_assert "transaction", "createTransactionRequest",
+      fn() ->
+        alias AuthorizeNet.Transaction, as: T
+        card = AuthorizeNet.Card.new "5424000000000015", "2015-08", "901"
+        T.new(3.03) |>
+        T.auth_capture |>
+        T.pay_with_card(card) |>
+        T.run
+      end,
+      fn(body, msgs) ->
+        [card] = xml_find body, "//creditCard"
+        assert_fields(card, msgs, [
+          {"cardNumber", "5424000000000015"},
+          {"expirationDate", "2015-08"},
+          {"cardCode", "901"}
+        ])
+      end,
+      fn(_result) -> true end
+  end
+
+  test "can pay a transaction with bank account" do
+    request_assert "transaction", "createTransactionRequest",
+      fn() ->
+        alias AuthorizeNet.Transaction, as: T
+        account = AuthorizeNet.BankAccount.savings(
+          "bank_name", "87654321",
+          "12345678", "name_on_account", :ccd
+        )
+        T.new(3.03) |>
+        T.auth_capture |>
+        T.pay_with_bank_account(account) |>
+        T.run
+      end,
+      fn(body, msgs) ->
+        [acc] = xml_find body, "//bankAccount"
+        assert_fields(acc, msgs, [
+          {"bankName", "bank_name"},
+          {"echeckType", "CCD"},
+          {"nameOnAccount", "name_on_account"},
+          {"accountNumber", "12345678"},
+          {"routingNumber", "87654321"},
+          {"accountType", "savings"}
+        ])
+      end,
+      fn(_result) -> true end
+  end
+
   test "can do a generic transaction" do
     request_assert "transaction", "createTransactionRequest",
       fn() ->
-        card = AuthorizeNet.Card.new "5424000000000015", "2015-08", "901"
         address = AuthorizeNet.Address.new(
           "first_name",
           "last_name",
@@ -685,9 +829,6 @@ defmodule AuthorizeNetTest do
         T.new(3.01) |>
         T.ref_transaction_id("9992") |>
         T.customer_individual("id1", "email@host.com") |>
-        T.enable_partial_auth |>
-        T.enable_duplicate_window |>
-        T.enable_test_request |>
         T.auth_capture() |>
         T.employee_id(5678) |>
         T.market_retail |>
@@ -704,7 +845,6 @@ defmodule AuthorizeNetTest do
         T.add_item(2, "item2", "itemdesc2", 1, 2.00) |>
         T.po_number("po_number") |>
         T.bill_to(address) |>
-        T.pay_with_card(card) |>
         T.pay_with_customer_profile(35962612, 32510145, 34066235, "901") |>
         T.customer_ip("127.0.0.1") |>
         T.run
@@ -719,7 +859,6 @@ defmodule AuthorizeNetTest do
         [tax] = xml_find body, "//tax"
         [duty] = xml_find body, "//duty"
         [shipping] = xml_find body, "//shipping"
-        [s1, s2, s3] = xml_find body, "//setting"
         [customer] = xml_find body, "//customer"
         assert "3.01" === hd(xml_value body, "//amount")
         msgs = assert_fields(body, msgs, [
@@ -801,18 +940,6 @@ defmodule AuthorizeNetTest do
           {"name", "ship_cost"},
           {"description", "ship_description"},
           {"amount", "3.44"}
-        ])
-        assert_fields(s1, msgs, [
-          {"settingName", "allowPartialAuth"},
-          {"settingValue", "true"}
-        ])
-        assert_fields(s2, msgs, [
-          {"settingName", "duplicateWindow"},
-          {"settingValue", "true"}
-        ])
-        assert_fields(s3, msgs, [
-          {"settingName", "testRequest"},
-          {"settingValue", "true"}
         ])
         assert_fields(customer, msgs, [
           {"type", "individual"},
