@@ -2,7 +2,9 @@
 
 # elixir_authorizenet
 
-Elixir client for the [Authorize.Net merchant API](http://developer.authorize.net/api/reference/index.html).
+Elixir client for the [Authorize.Net merchant API](http://developer.authorize.net/api/reference/index.html). This
+should help you integrate using the [AIM](http://developer.authorize.net/api/aim/).
+
 A nice number of features are implemented (probably most of the ones used
 on a daily basis are already there), but since the API offers a big number of
 features and combinations, I still consider this as WIP, and pull requests,
