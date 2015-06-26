@@ -573,6 +573,274 @@ defmodule AuthorizeNetTest do
       fn(result) -> assert :ok === result end
   end
 
+  test "can do a generic auth_only transaction" do
+    request_assert "transaction", "createTransactionRequest",
+      fn() ->
+        alias AuthorizeNet.Transaction, as: T
+        T.new |>
+        T.auth_only() |>
+        T.run
+      end,
+      fn(body, msgs) ->
+        assert_fields(body, msgs, [
+          {"transactionType", "authOnlyTransaction"}
+        ])
+      end,
+      fn(_result) -> true end
+  end
+
+  test "can do a generic void transaction" do
+    request_assert "transaction", "createTransactionRequest",
+      fn() ->
+        alias AuthorizeNet.Transaction, as: T
+        T.new |>
+        T.void("1234") |>
+        T.run
+      end,
+      fn(body, msgs) ->
+        assert_fields(body, msgs, [
+          {"transactionType", "voidTransaction"}
+        ])
+      end,
+      fn(_result) -> true end
+  end
+
+  test "can do a generic prior auth capture transaction" do
+    request_assert "transaction", "createTransactionRequest",
+      fn() ->
+        alias AuthorizeNet.Transaction, as: T
+        T.new |>
+        T.prior_auth_capture |>
+        T.run
+      end,
+      fn(body, msgs) ->
+        assert_fields(body, msgs, [
+          {"transactionType", "priorAuthCaptureTransaction"}
+        ])
+      end,
+      fn(_result) -> true end
+  end
+
+  test "can do a generic capture only transaction" do
+    request_assert "transaction", "createTransactionRequest",
+      fn() ->
+        alias AuthorizeNet.Transaction, as: T
+        T.new |>
+        T.capture_only |>
+        T.run
+      end,
+      fn(body, msgs) ->
+        assert_fields(body, msgs, [
+          {"transactionType", "captureOnlyTransaction"}
+        ])
+      end,
+      fn(_result) -> true end
+  end
+
+  test "can do a generic refund transaction" do
+    request_assert "transaction", "createTransactionRequest",
+      fn() ->
+        alias AuthorizeNet.Transaction, as: T
+        T.new |>
+        T.refund("123123") |>
+        T.run
+      end,
+      fn(body, msgs) ->
+        assert_fields(body, msgs, [
+          {"transactionType", "refundTransaction"}
+        ])
+      end,
+      fn(_result) -> true end
+  end
+
+  test "can do a generic failed transaction" do
+    request_assert "failed_transaction", "createTransactionRequest",
+      fn() ->
+        alias AuthorizeNet.Transaction, as: T
+        T.new |>
+        T.auth_capture() |>
+        T.run
+      end,
+      fn(_body, _msgs) -> [] end,
+      fn(result) -> refute result.success end
+  end
+
+  test "can do a generic transaction" do
+    request_assert "transaction", "createTransactionRequest",
+      fn() ->
+        card = AuthorizeNet.Card.new "5424000000000015", "2015-08", "901"
+        address = AuthorizeNet.Address.new(
+          "first_name",
+          "last_name",
+          "company",
+          "street",
+          "city",
+          "state",
+          "46282",
+          "country",
+          "phone",
+          "fax"
+        )
+        alias AuthorizeNet.Transaction, as: T
+        T.new(3.01) |>
+        T.ref_transaction_id("9992") |>
+        T.customer_individual("id1", "email@host.com") |>
+        T.enable_partial_auth |>
+        T.enable_duplicate_window |>
+        T.enable_test_request |>
+        T.auth_capture() |>
+        T.employee_id(5678) |>
+        T.market_retail |>
+        T.device_virtual_terminal |>
+        T.tax_exempt |>
+        T.auth_code("44556") |>
+        T.tax("tax_name", "tax_description", 3.44) |>
+        T.duty("duty_name", "duty_description", 3.44) |>
+        T.ship_to(address) |>
+        T.shipping_cost("ship_cost", "ship_description", 3.44) |>
+        T.user_fields(%{"key1": "value1", "key2": "value2"}) |>
+        T.order("4455", "order_description") |>
+        T.add_item(1, "item1", "itemdesc1", 1, 1.00) |>
+        T.add_item(2, "item2", "itemdesc2", 1, 2.00) |>
+        T.po_number("po_number") |>
+        T.bill_to(address) |>
+        T.pay_with_card(card) |>
+        T.pay_with_customer_profile(35962612, 32510145, 34066235, "901") |>
+        T.customer_ip("127.0.0.1") |>
+        T.run
+      end,
+      fn(body, msgs) ->
+        [profile] = xml_find body, "//profile"
+        [order] = xml_find body, "//order"
+        [f1, f2] = xml_find body, "//userField"
+        [ship_to] = xml_find body, "//shipTo"
+        [bill_to] = xml_find body, "//billTo"
+        [i1, i2] = xml_find body, "//lineItem"
+        [tax] = xml_find body, "//tax"
+        [duty] = xml_find body, "//duty"
+        [shipping] = xml_find body, "//shipping"
+        [s1, s2, s3] = xml_find body, "//setting"
+        [customer] = xml_find body, "//customer"
+        assert "3.01" === hd(xml_value body, "//amount")
+        msgs = assert_fields(body, msgs, [
+          {"marketType", "2"},
+          {"deviceType", "10"},
+          {"refTransId", "9992"},
+          {"customerIP", "127.0.0.1"},
+          {"employeeId", "5678"},
+          {"taxExempt", "true"},
+          {"poNumber", "po_number"},
+          {"authCode", "44556"},
+          {"transactionType", "authCaptureTransaction"}
+        ])
+        assert_fields(profile, msgs, [
+          {"customerProfileId", "35962612"},
+          {"paymentProfileId", "32510145"},
+          {"shippingProfileId", "34066235"},
+          {"cardCode", "901"}
+        ])
+        assert_fields(order, msgs, [
+          {"invoiceNumber", "4455"},
+          {"description", "order_description"}
+        ])
+        assert_fields(i1, msgs, [
+          {"itemId", "1"},
+          {"name", "item1"},
+          {"description", "itemdesc1"},
+          {"quantity", "1"},
+          {"unitPrice", "1.0"}
+        ])
+        assert_fields(i2, msgs, [
+          {"itemId", "2"},
+          {"name", "item2"},
+          {"description", "itemdesc2"},
+          {"quantity", "1"},
+          {"unitPrice", "2.0"}
+        ])
+        assert_fields(ship_to, msgs, [
+          {"firstName", "first_name"},
+          {"lastName", "last_name"},
+          {"company", "company"},
+          {"address", "street"},
+          {"city", "city"},
+          {"state", "state"},
+          {"zip", "46282"},
+          {"country", "country"}
+        ])
+        assert_fields(f2, msgs, [
+          {"name", "key2"},
+          {"value", "value2"}
+        ])
+        assert_fields(f1, msgs, [
+          {"name", "key1"},
+          {"value", "value1"}
+        ])
+        assert_fields(bill_to, msgs, [
+          {"firstName", "first_name"},
+          {"lastName", "last_name"},
+          {"company", "company"},
+          {"address", "street"},
+          {"city", "city"},
+          {"state", "state"},
+          {"zip", "46282"},
+          {"country", "country"},
+          {"faxNumber", "fax"},
+          {"phoneNumber", "phone"}
+        ])
+        assert_fields(tax, msgs, [
+          {"name", "tax_name"},
+          {"description", "tax_description"},
+          {"amount", "3.44"}
+        ])
+        assert_fields(duty, msgs, [
+          {"name", "duty_name"},
+          {"description", "duty_description"},
+          {"amount", "3.44"}
+        ])
+        assert_fields(shipping, msgs, [
+          {"name", "ship_cost"},
+          {"description", "ship_description"},
+          {"amount", "3.44"}
+        ])
+        assert_fields(s1, msgs, [
+          {"settingName", "allowPartialAuth"},
+          {"settingValue", "true"}
+        ])
+        assert_fields(s2, msgs, [
+          {"settingName", "duplicateWindow"},
+          {"settingValue", "true"}
+        ])
+        assert_fields(s3, msgs, [
+          {"settingName", "testRequest"},
+          {"settingValue", "true"}
+        ])
+        assert_fields(customer, msgs, [
+          {"type", "individual"},
+          {"id", "id1"},
+          {"email", "email@host.com"}
+        ])
+      end,
+      fn(result) ->
+        assert result === %AuthorizeNet.TransactionResponse{
+          code: 1,
+          auth_code: "000000",
+          avs_result: "P",
+          cvv_result: "A",
+          cavv_result: "Z",
+          transaction_id: "0",
+          ref_transaction_id: "AAAA",
+          transaction_hash: "ABE0074FA756F889478472425EA85DBE",
+          test_request: "1",
+          account_number: "XXXX0015",
+          account_type: "MasterCard",
+          errors: [{"I00001", "Successful."}],
+          user_fields: [{"a", "B"}, {"b", "f"}],
+          success: true,
+          operation_errors: [{"54", "The referenced transaction does not meet the criteria for issuing a credit."}]
+        }
+      end
+  end
+
   defp request_assert(
     file, request_type, request_fun, server_asserts_fun, client_asserts_fun
   ) do

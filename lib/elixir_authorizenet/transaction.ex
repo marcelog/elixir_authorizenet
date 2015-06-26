@@ -752,7 +752,7 @@ defmodule AuthorizeNet.Transaction do
           description: transaction.order.description
         ]
       end),
-      lineItems: for i <- transaction.items do
+      lineItems: for i <- Enum.reverse(transaction.items) do
         {:lineItem, [
           itemId: i.id,
           name: i.name,
@@ -766,7 +766,7 @@ defmodule AuthorizeNet.Transaction do
       else
         [
           amount: to_string(transaction.tax.amount),
-          name: transaction.tax.description,
+          name: transaction.tax.name,
           description: transaction.tax.description
         ]
       end),
@@ -775,7 +775,7 @@ defmodule AuthorizeNet.Transaction do
       else
         [
           amount: to_string(transaction.duty.amount),
-          name: transaction.duty.description,
+          name: transaction.duty.name,
           description: transaction.duty.description
         ]
       end),
@@ -784,7 +784,7 @@ defmodule AuthorizeNet.Transaction do
       else
         [
           amount: to_string(transaction.shipping_cost.amount),
-          name: transaction.shipping_cost.description,
+          name: transaction.shipping_cost.name,
           description: transaction.shipping_cost.description
         ]
       end),
