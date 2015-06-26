@@ -264,7 +264,101 @@ struct, like:
  transaction_id: "2235759738", user_fields: [{"key1", "value1"}, {"key2", "value2"}]}
 ```
 
-### Simple credit card transaction
+### Transaction types
+Authorize.Net supports different [transaction types](https://support.authorize.net/authkb/index?page=content&id=A510).
+You can choose between them as follows:
+```elixir
+T.new                     |>
+T.auth_capture()          # or
+T.auth_only()             # or
+T.capture_only()          # or
+T.prior_auth_capture()    # or
+T.void(transaction_id)    # or
+T.refund(transaction_id)  # or
+```
+
+### Adding customer, billing and shipping information
+These might or might not be required depending on the type of payment you choose
+(i.e: customer profiles include the billing and shipping information in their
+payment profile ids and shipping address ids respectively):
+
+```elixir
+T.bill_to(address)                             |>
+T.ship_to(address)                             |>
+T.customer_individual("id1", "email@host.com") |>
+
+# You can also specify a "business" customer instead:
+T.customer_business("id1", "email@host.com")
+```
+
+### Transaction Settings
+You can enable and disable different transaction settings, like:
+```elixir
+T.enable_partial_auth      |>  # or T.disable_partial_auth
+T.enable_duplicate_window  |>  # or T.disable_duplicate_window
+T.enable_test_request      |>  # or T.disable_test_request
+T.enable_recurring_billing |>  # or T.disable_recurring_billing
+T.enable_email_customer        # or T.disable_email_customer
+```
+
+### Adding tax information
+Optionally, you can add some tax information:
+```elixir
+T.not_tax_exempt                              |> # or T.tax_exempt
+T.tax("name", "description", 3.44)            |>
+T.duty("name", "description", 3.44)           |>
+T.shipping_cost("name", "description", 3.44)
+```
+
+### Adding order information
+You can include the order information (and optionally any billing items and
+purchase order ) like this:
+
+```elixir
+T.order("4455", "order description")         |>
+T.add_item(1, "item1", "itemdesc1", 1, 1.00) |>
+T.add_item(2, "item2", "itemdesc2", 1, 2.00) |>
+T.po_number("po_number_1")
+```
+
+### Specifying market type
+```elixir
+T.market_retail    # or
+T.market_ecommerce # or
+T.market_moto
+```
+
+### Specifying device type
+```elixir
+T.device_website                  # or
+T.device_unknown                  # or
+T.device_unattended_terminal      # or
+T.device_electronic_cash_register # or
+T.device_personal_computer        # or
+T.device_air_pay                  # or
+T.device_self_service_terminal    # or
+T.device_wireless_pos             # or
+T.device_dial_terminal            # or
+T.device_virtual_terminal         # or
+```
+
+### Adding custom fields
+```elixir
+T.user_fields(%{
+  "key1": "value1",
+  "key2": "value2"
+})
+```
+
+### Other information you can add to the transaction.
+```elixir
+T.auth_code("QFBYYN")              |> # Used for already authorised transactions.
+T.ref_transaction_id("2235786422") |> # Used to refund or credit
+T.employee_id(5678)                |>
+T.customer_ip("127.0.0.1")
+```
+
+### Paying with credit card
 ```elixir
 T.new(10.25)                         |>
 T.auth_capture()                     |>
@@ -307,113 +401,20 @@ T.order("4455", "order description") |>
 T.run
 ```
 
-### Transaction Settings
-You can enable and disable different transaction settings, like:
-```elixir
-T.enable_partial_auth      |>  # or T.disable_partial_auth
-T.enable_duplicate_window  |>  # or T.disable_duplicate_window
-T.enable_test_request      |>  # or T.disable_test_request
-T.enable_recurring_billing |>  # or T.disable_recurring_billing
-T.enable_email_customer        # or T.disable_email_customer
-```
-
-### Adding tax information
-Optionally, you can add some tax information:
-```elixir
-T.not_tax_exempt                              |> # or T.tax_exempt
-T.tax("name", "description", 3.44)            |>
-T.duty("name", "description", 3.44)           |>
-T.shipping_cost("name", "description", 3.44)
-```
-
-### Adding order information
-You can include the order information (and optionally any billing items and
-purchase order ) like this:
-
-```elixir
-T.order("4455", "order description")         |>
-T.add_item(1, "item1", "itemdesc1", 1, 1.00) |>
-T.add_item(2, "item2", "itemdesc2", 1, 2.00) |>
-T.po_number("po_number_1")
-```
-
-### Specifying market type
-```elixir
-T.market_retail  # or T.market_ecommerce or T.market_moto
-```
-
-### Specifying device type
-```elixir
-T.device_website  # or T.device_unknown or
-                  # or T.device_unattended_terminal
-                  # or T.device_electronic_cash_register
-                  # or T.device_personal_computer
-                  # or T.device_air_pay
-                  # or T.device_self_service_terminal
-                  # or T.device_wireless_pos
-                  # or T.device_dial_terminal
-                  # or T.device_virtual_terminal
-```
-
-### Adding custom fields
-```elixir
-T.user_fields(%{
-  "key1": "value1",
-  "key2": "value2"
-})
-```
-### Full Example
-Let's see a crude example of **all** the things you can use and combine
-(be advised that this is a long example but most of the stuff is optional,
-and in the end you only need to use the combinations that suit your needs). You
-might also want to check the [Transaction](https://github.com/marcelog/elixir_authorizenet/blob/master/lib/elixir_authorizenet/transaction.ex)
-module and the [docs](http://hexdocs.pm/elixir_authorizenet/) at hex.pm.
-
-```elixir
-# Amount is optional and only needed to debit, credit, charge, or refund
-T.new(amount) |>
-
-# Only needed for previously authorized transactions
-T.auth_code("QFBYYN") |>
-T.auth_capture() |> # or T.auth_only
-                    # or T.capture_only
-                    # or T.prior_auth_capture
-                    # or T.refund
-                    # or T.void
-
-# or T.customer_business
-T.customer_individual("id1", "email@host.com") |>
-
-# Only needed for refund, void, credit, etc.
-T.ref_transaction_id("2235786422") |>
-
-
-T.employee_id(5678) |>
-T.market_retail |>           # or T.market_ecommerce or T.market_moto
-
-T.bill_to(address) |>        # Not needed when charging with a customer profile
-T.ship_to(address) |>        # Can be replaced with a shipping address id from a customer profile
-T.pay_with_customer_profile(customer_id, payment_profile_id, shipping_address_id, card_code) |>  # or T.pay_with_card(card)
-                                                                                                 # or T.pay_with_apple_pay(data)
-                                                                                                 # or T.pay_with_bank_account(account)
-T.customer_ip("127.0.0.1") |>
-T.run
-```
-
 ### Voiding a transaction
 ```elixir
-T.new |>
+T.new                |>
 T.void("2235759535") |>
 T.run
 ```
 
 ### Refund a transaction
 ```elixir
-T.new(3.00) |>
-T.bill_to(address) |>
+T.new(3.00)                          |>
+T.bill_to(address)                   |>
 T.order("4455", "order description") |>
-T.pay_with_card(card) |>
-T.refund("2235759535") |>
+T.pay_with_card(card)                |>
+T.refund("2235759535")               |>
 T.run
 ```
 
