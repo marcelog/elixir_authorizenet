@@ -256,13 +256,6 @@ T.pay_with_customer_profile(35962612, 32510145, 34066235, "900") |>  # or T.pay_
                                                                      # or T.pay_with_apple_pay(data)
 T.customer_ip("127.0.0.1") |>
 T.run
-```
-
-### Voiding a transaction
-```elixir
-T.new |>
-T.void("2235759535") |>
-T.run
 
 %AuthorizeNet.TransactionResponse{account_number: "XXXX0015",
  account_type: "MasterCard", auth_code: "QWIDX2", avs_result: "Y",
@@ -272,6 +265,13 @@ T.run
  transaction_hash: "D05A1D1C4558FB329522CCFC62B4A7F3",
  transaction_id: "2235759738", user_fields: [{"key1", "value1"}, {"key2", "value2"}]}
 
+```
+
+### Voiding a transaction
+```elixir
+T.new |>
+T.void("2235759535") |>
+T.run
 ```
 
 ----
