@@ -288,6 +288,8 @@ These errors might be raised by the API calls:
 ## License
 The source code is released under Apache 2 License.
 
+Check [LICENSE](https://github.com/marcelog/elixir_authorizenet/blob/master/LICENSE) file for more information.
+
 ## TODO
  * Add support for [updating a payment profile](http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-update-customer-profile).
  * Allow payment profiles when creating a customer profile.
@@ -295,4 +297,9 @@ The source code is released under Apache 2 License.
  * Add support for [creating a customer profile from a successful transaction](http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-create-a-customer-profile-from-a-transaction).
  * Add support for [recurring billing](http://developer.authorize.net/api/reference/index.html#recurring-billing).
 
-Check [LICENSE](https://github.com/marcelog/elixir_authorizenet/blob/master/LICENSE) file for more information.
+## Useful Authorize.Net documentation
+ * [API reference](http://developer.authorize.net/api/reference/).
+ * [Transaction Types](https://support.authorize.net/authkb/index?page=content&id=A510).
+ * How to generate [specific error codes](http://developer.authorize.net/tools/errorgenerationguide/) useful for testing purposes.
+ * Error reason [check tool](http://developer.authorize.net/tools/responsereasoncode/).
+ * [FAQ about sandbox environment](https://community.developer.authorize.net/t5/The-Authorize-Net-Developer-Blog/Authorize-Net-Sandbox-FAQs/ba-p/17440).
