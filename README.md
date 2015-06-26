@@ -313,7 +313,6 @@ The source code is released under Apache 2 License.
 Check [LICENSE](https://github.com/marcelog/elixir_authorizenet/blob/master/LICENSE) file for more information.
 
 ## TODO
- * Add support for [updating a payment profile](http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-update-customer-profile).
  * Allow payment profiles when creating a customer profile.
  * Add support for [hosted profile page](http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-get-hosted-profile-page).
  * Add support for [creating a customer profile from a successful transaction](http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-create-a-customer-profile-from-a-transaction).
