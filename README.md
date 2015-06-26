@@ -28,10 +28,19 @@ Feel free to take a look at the [documentation](http://hexdocs.pm/elixir_authori
 served by hex.pm or the source itself to find more.
 
 ## Customer Profiles
+These are used when you want to store information in the Authorize.Net servers,
+like credit card or bank account information, and also billing and shipping
+addresses. This effectively is the interface to the [CIM](http://developer.authorize.net/api/cim/).
+
+Customer Profiles are used via the [Customer](https://github.com/marcelog/elixir_authorizenet/blob/master/lib/elixir_authorizenet/customer.ex) module.
+
+```elixir
+alias AuthorizeNet.Customer, as: C
+```
 
 ### Creating
 ```elixir
-  > AuthorizeNet.Customer.create "merchantId", "description", "email@host.com"
+  > C.create "merchantId", "description", "email@host.com"
   %AuthorizeNet.Customer{description: "description", email: "email@host.com",
    id: "merchantId", payment_profiles: [], profile_id: 35962612,
    shipping_addresses: []}
@@ -39,7 +48,7 @@ served by hex.pm or the source itself to find more.
 
 ### Updating
 ```elixir
-  > AuthorizeNet.Customer.update 35962612, "merchantId", "description", "email2@host.com"
+  > C.update 35962612, "merchantId", "description", "email2@host.com"
   %AuthorizeNet.Customer{description: "description", email: "email2@host.com",
    id: "merchantId", payment_profiles: [], profile_id: 35962612,
    shipping_addresses: []}
@@ -47,13 +56,13 @@ served by hex.pm or the source itself to find more.
 
 ### Get all IDs
 ```elixir
-  > AuthorizeNet.Customer.get_all
+  > C.get_all
   [35962612]
 ```
 
 ### Get Customer Profile
 ```elixir
-  > AuthorizeNet.Customer.get 35962612
+  > C.get 35962612
   %AuthorizeNet.Customer{description: "description", email: "email2@host.com",
    id: "merchantId", payment_profiles: [], profile_id: 35962612,
    shipping_addresses: []}
@@ -61,7 +70,7 @@ served by hex.pm or the source itself to find more.
 
 ### Deleting
 ```elixir
-  > AuthorizeNet.Customer.delete 35962612
+  > C.delete 35962612
   :ok
 ```
 
@@ -207,8 +216,8 @@ The last argument is the type of [echeck](https://www.authorize.net/support/CNP/
 ## Making transactions
 
 ### In a nutshell
-Transactions are made via the [Transaction](https://github.com/marcelog/elixir_authorizenet/blob/master/lib/elixir_authorizenet/transaction.ex). To
-create a transaction, just call the `new` function, passing an optional amount (a float) as the argument.
+Transactions are made via the [Transaction](https://github.com/marcelog/elixir_authorizenet/blob/master/lib/elixir_authorizenet/transaction.ex) module.
+To create a transaction, just call the `new` function, passing an optional amount (a float) as the argument.
 
 ```elixir
 alias AuthorizeNet.Transaction, as: T
