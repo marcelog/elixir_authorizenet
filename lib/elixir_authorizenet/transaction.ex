@@ -185,7 +185,7 @@ defmodule AuthorizeNet.Transaction do
   @doc """
   Adds customer information for an individual.
   """
-  @spec customer_business(
+  @spec customer_individual(
     AuthorizeNet.Transaction.t, String.t, String.t
   ) :: AuthorizeNet.Transaction.t
   def customer_individual(transaction, id, email) do
