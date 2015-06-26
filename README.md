@@ -206,11 +206,46 @@ The last argument is the type of [echeck](https://www.authorize.net/support/CNP/
 
 ## Making transactions
 
+### In a nutshell
+Transactions are made via the [Transaction](https://github.com/marcelog/elixir_authorizenet/blob/master/lib/elixir_authorizenet/transaction.ex). To
+create a transaction, just call the `new` function, passing an optional amount (a float) as the argument.
+
+```elixir
+alias AuthorizeNet.Transaction, as: T
+
+T.new(12.34)
+```
+
+To run a transaction, just call the `run` function:
+```elixir
+T.new(12.34) |>
+T.run
+```
+
+### TransactionResponse
+All transactions will return a [TransactionResponse](https://github.com/marcelog/elixir_authorizenet/blob/master/lib/elixir_authorizenet/transaction_response.ex)
+struct, like:
+
+```elixir
+%AuthorizeNet.TransactionResponse{account_number: "XXXX0015",
+ account_type: "MasterCard", auth_code: "QWIDX2", avs_result: "Y",
+ cavv_result: nil, code: 1, cvv_result: nil,
+ errors: [{"I00001", "Successful."}], operation_errors: [],
+ ref_transaction_id: nil, success: true, test_request: "0",
+ transaction_hash: "D05A1D1C4558FB329522CCFC62B4A7F3",
+ transaction_id: "2235759738", user_fields: [{"key1", "value1"}, {"key2", "value2"}]}
+```
+
+### Charging transactions
 For transactions, you usually need a credit card, a bank account, a billing address,
 and an optional shipping address.
+
 ```elixir
+
 account = AuthorizeNet.BankAccount.savings "bank_name", "routing_number", "12345678", "name_on_account", :ccd
+
 card = AuthorizeNet.Card.new "5424000000000015", "2015-08", "900"
+
 address = AuthorizeNet.Address.new(
   "first_name",
   "last_name",
@@ -224,6 +259,7 @@ address = AuthorizeNet.Address.new(
   "fax"
 )
 ```
+
 ### Simple credit card transaction
 ```elixir
 T.new(10.25) |>
@@ -267,18 +303,16 @@ T.order("4455", "order description") |>
 T.run
 ```
 
-### TransactionResponse
-All transactions will returns a [TransactionResponse](https://github.com/marcelog/elixir_authorizenet/blob/master/lib/elixir_authorizenet/transaction_response.ex)
-struct, like:
-
+### Transaction Settings
+You can enable and disable different transaction settings, like:
 ```elixir
-%AuthorizeNet.TransactionResponse{account_number: "XXXX0015",
- account_type: "MasterCard", auth_code: "QWIDX2", avs_result: "Y",
- cavv_result: nil, code: 1, cvv_result: nil,
- errors: [{"I00001", "Successful."}], operation_errors: [],
- ref_transaction_id: nil, success: true, test_request: "0",
- transaction_hash: "D05A1D1C4558FB329522CCFC62B4A7F3",
- transaction_id: "2235759738", user_fields: [{"key1", "value1"}, {"key2", "value2"}]}
+T.new |>
+T.enable_partial_auth |>       # or T.disable_partial_auth
+T.enable_duplicate_window |>   # or T.disable_duplicate_window
+T.enable_test_request |>       # or T.disable_test_request
+T.enable_recurring_billing |>  # or T.disable_recurring_billing
+T.enable_email_customer |>     # or T.disable_email_customer
+T.run
 ```
 
 ### Full Example
@@ -289,18 +323,24 @@ might also want to check the [Transaction](https://github.com/marcelog/elixir_au
 module and the [docs](http://hexdocs.pm/elixir_authorizenet/) at hex.pm.
 
 ```elixir
-T.new(amount) |>             # Amount is optional and only needed to debit, credit, charge, or refund
-T.auth_code("QFBYYN") |>     # Only needed for previously authorized transactions
-T.auth_capture() |>          # or T.auth_only
-                             # or T.capture_only
-                             # or T.prior_auth_capture
-                             # or T.refund
-                             # or T.void
-T.customer_individual("id1", "email@host.com") |> # or T.customer_business
-T.ref_transaction_id("2235786422") |> # Only needed for refund, void, credit, etc.
-T.enable_partial_auth |>     # or T.disable_partial_auth
-T.enable_duplicate_window |> # or T.disable_duplicate_window
-T.enable_test_request |>     # or T.disable_test_request
+# Amount is optional and only needed to debit, credit, charge, or refund
+T.new(amount) |>
+
+# Only needed for previously authorized transactions
+T.auth_code("QFBYYN") |>
+T.auth_capture() |> # or T.auth_only
+                    # or T.capture_only
+                    # or T.prior_auth_capture
+                    # or T.refund
+                    # or T.void
+
+# or T.customer_business
+T.customer_individual("id1", "email@host.com") |>
+
+# Only needed for refund, void, credit, etc.
+T.ref_transaction_id("2235786422") |>
+
+
 T.employee_id(5678) |>
 T.market_retail |>           # or T.market_ecommerce or T.market_moto
 T.device_website |>          # or T.device_unknown or
