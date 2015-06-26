@@ -77,20 +77,37 @@ alias AuthorizeNet.Customer, as: C
 ```
 
 ----
-## Shipping Addresses
 
-First, create an address:
-
+## Addresses
+To handle billing and shipping addresses, use the [Address](https://github.com/marcelog/elixir_authorizenet/blob/master/lib/elixir_authorizenet/address.ex)
+module.
 ```elixir
-  > address = AuthorizeNet.Address.new "first_name", "last_name", "company", "street", "city", "state", "zip", "country", "phone", "fax"
-  %AuthorizeNet.Address{address: "street", city: "city", company: "company",
-   country: "country", customer_id: nil, fax: "fax", first_name: "first_name",
-   id: nil, last_name: "last_name", phone: "phone", state: "state", zip: "zip"}
+alias AuthorizeNet.Addresses, as: A
+
+address = A.new(
+  "first_name",
+  "last_name",
+  "company",
+  "street",
+  "city",
+  "state",
+  "zip",
+  "country",
+  "phone",
+  "fax"
+)
+%AuthorizeNet.Address{address: "street", city: "city", company: "company",
+ country: "country", customer_id: nil, fax: "fax", first_name: "first_name",
+ id: nil, last_name: "last_name", phone: "phone", state: "state", zip: "zip"}
 ```
+
+----
+## Shipping Addresses
+You can do some CRUD with shipping addresses in a customer profile.
 
 ### Creating
 ```elixir
-  > AuthorizeNet.Customer.create_shipping_address 35962612, address
+  > C.create_shipping_address 35962612, address
   %AuthorizeNet.Address{address: "street", city: "city", company: "company",
    country: "country", customer_id: 35962612, fax: "fax",
    first_name: "first_name", id: 34066037, last_name: "last_name", phone: "phone",
@@ -99,7 +116,7 @@ First, create an address:
 
 ### Getting
 ```elixir
-  > AuthorizeNet.Customer.get_shipping_address 35962612, 34066037
+  > C.get_shipping_address 35962612, 34066037
   %AuthorizeNet.Address{address: "street", city: "city", company: "company",
    country: "country", customer_id: 35962612, fax: "fax",
    first_name: "first_name", id: 34066037, last_name: "last_name", phone: "phone",
@@ -111,7 +128,7 @@ Make sure you have an `AuthorizeNet.Address` struct with customer_id and id alre
 (for example by getting it from the server). Then:
 
 ```elixir
-  > AuthorizeNet.Customer.update_shipping_address address
+  > C.update_shipping_address address
   %AuthorizeNet.Address{address: "street", city: "city", company: "company",
    country: "country", customer_id: 35962612, fax: "fax",
    first_name: "first_name", id: 34066235, last_name: "last_name", phone: "phone",
@@ -120,7 +137,7 @@ Make sure you have an `AuthorizeNet.Address` struct with customer_id and id alre
 
 ### Deleting
 ```elixir
-  > AuthorizeNet.Customer.delete_shipping_address 35962612, 34066037
+  > C.delete_shipping_address 35962612, 34066037
   :ok
 ```
 ----
