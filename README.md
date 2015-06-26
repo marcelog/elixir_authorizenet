@@ -1,14 +1,14 @@
 [![Build Status](https://travis-ci.org/marcelog/elixir_authorizenet.svg)](https://travis-ci.org/marcelog/elixir_authorizenet)
 
-elixir_authorizenet
-===================
+# elixir_authorizenet
 
 Elixir client for the [Authorize.Net merchant API](http://developer.authorize.net/api/reference/index.html).
-This is WIP.
+A nice number of features are implemented (probably most of the ones used
+on a daily basis are already there), but since the API offers a big number of
+features and combinations, I still consider this as WIP, and pull requests,
+suggestions, or other kind of feedback are very welcome!
 
-Take a look at the [documentation](http://hexdocs.pm/elixir_authorizenet/) served by hex.pm.
-
-## Using it with Mix
+# Using it with Mix
 
 To use it in your Mix projects, first add it as a dependency:
 
@@ -20,6 +20,12 @@ end
 Then run mix deps.get to install it.
 
 ----
+
+# Documentation
+
+What follows is just a glance, a quick overview of the common used features.
+Feel free to take a look at the [documentation](http://hexdocs.pm/elixir_authorizenet/)
+served by hex.pm or the source itself to find more.
 
 ## Customer Profiles
 
@@ -307,18 +313,18 @@ These errors might be raised by the API calls:
 
  * [AuthorizeNet.Error.Operation](https://github.com/marcelog/elixir_authorizenet/blob/master/lib/elixir_authorizenet/error/operation_error.ex): The request was sent and received successfully, a status 200 was returned by the server, but there was an error when trying to process the operation.
 
-## License
+# License
 The source code is released under Apache 2 License.
 
 Check [LICENSE](https://github.com/marcelog/elixir_authorizenet/blob/master/LICENSE) file for more information.
 
-## TODO
+# TODO
  * Allow payment profiles when creating a customer profile.
  * Add support for [hosted profile page](http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-get-hosted-profile-page).
  * Add support for [creating a customer profile from a successful transaction](http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-create-a-customer-profile-from-a-transaction).
  * Add support for [recurring billing](http://developer.authorize.net/api/reference/index.html#recurring-billing).
 
-## Useful Authorize.Net documentation
+# Useful Authorize.Net documentation
  * [API reference](http://developer.authorize.net/api/reference/).
  * [Transaction Types](https://support.authorize.net/authkb/index?page=content&id=A510).
  * How to generate [specific error codes](http://developer.authorize.net/tools/errorgenerationguide/) useful for testing purposes.
