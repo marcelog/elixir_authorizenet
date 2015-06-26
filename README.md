@@ -200,12 +200,16 @@ The last argument is the type of [echeck](https://www.authorize.net/support/CNP/
 
 ## Making transactions
 
-Let's see a crude example of **all** the things you can use and combine (be advised that this is a long example
-but most of the stuff is optional, and in the end you only need to use the combinations that suit your needs):
+Let's see a crude example of **all** the things you can use and combine
+(be advised that this is a long example but most of the stuff is optional,
+and in the end you only need to use the combinations that suit your needs). You
+might also want to check the [Transaction](https://github.com/marcelog/elixir_authorizenet/blob/master/lib/elixir_authorizenet/transaction.ex)
+module and the [docs](http://hexdocs.pm/elixir_authorizenet/) at hex.pm.
 
 ```elixir
 
-# For the sake of simplicity, define an alias for the module, a credit card, a bank account, and an address for shipping.
+# For the sake of simplicity, define an alias for the module, a credit card,
+# a bank account, and an address for shipping.
 alias AuthorizeNet.Transaction, as: T
 account = AuthorizeNet.BankAccount.savings "bank_name", "routing_number", "12345678", "name_on_account", :ccd
 card = AuthorizeNet.Card.new "5424000000000015", "2015-08", "900"
@@ -222,12 +226,16 @@ address = AuthorizeNet.Address.new(
   "fax"
 )
 
-# Now let's see everything that we can set.
-T.new(3.00) |>
+# Now let's see everything that we can set. Again: It's very probable that in
+# your daily use cases you will only need to set a very small number of things.
+T.new(3.00) |>               # Amount is optional and only needed to debit, credit, charge, or refund
 T.auth_code("QFBYYN") |>     # Only needed for previously authorized transactions
 T.auth_capture() |>          # or T.auth_only
                              # or T.capture_only
                              # or T.prior_auth_capture
+                             # or T.refund
+                             # or T.void
+T.customer_individual("id1", "email@host.com") |> # or T.customer_business
 T.ref_transaction_id("2235786422") |> # Only needed for refund, void, credit, etc.
 T.enable_partial_auth |>     # or T.disable_partial_auth
 T.enable_duplicate_window |> # or T.disable_duplicate_window
@@ -246,8 +254,8 @@ T.device_website |>          # or T.device_unknown or
 T.not_tax_exempt |>          # or T.tax_exempt
 T.tax("tax_name", "tax_description", 3.44) |>
 T.duty("duty_name", "duty_description", 3.44) |>
-T.bill_to(address) |>
-T.ship_to(address) |>
+T.bill_to(address) |>        # Not needed when charging with a customer profile
+T.ship_to(address) |>        # Can be replaced with a shipping address id from a customer profile
 T.shipping_cost("ship_cost", "ship_description", 3.44) |>
 T.user_fields(%{"key1": "value1", "key2": "value2"}) |>
 T.order("4455", "order description") |>

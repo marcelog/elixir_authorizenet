@@ -53,7 +53,8 @@ defmodule AuthorizeNet.Transaction do
     card_code: nil,
     ref_transaction_id: nil,
     bank_account: nil,
-    auth_code: nil
+    auth_code: nil,
+    customer: nil
 
   @type t :: Map
   @transaction_types [
@@ -179,6 +180,36 @@ defmodule AuthorizeNet.Transaction do
   ) :: AuthorizeNet.Transaction.t
   def bill_to(transaction, address) do
     %AuthorizeNet.Transaction{transaction | billing_address: address}
+  end
+
+  @doc """
+  Adds customer information for an individual.
+  """
+  @spec customer_business(
+    AuthorizeNet.Transaction.t, String.t, String.t
+  ) :: AuthorizeNet.Transaction.t
+  def customer_individual(transaction, id, email) do
+    customer = %{
+      type: "individual",
+      id: id,
+      email: email
+    }
+    %AuthorizeNet.Transaction{transaction | customer: customer}
+  end
+
+  @doc """
+  Adds customer information for a business.
+  """
+  @spec customer_business(
+    AuthorizeNet.Transaction.t, String.t, String.t
+  ) :: AuthorizeNet.Transaction.t
+  def customer_business(transaction, id, email) do
+    customer = %{
+      type: "business",
+      id: id,
+      email: email
+    }
+    %AuthorizeNet.Transaction{transaction | customer: customer}
   end
 
   @doc """
@@ -759,6 +790,15 @@ defmodule AuthorizeNet.Transaction do
       end),
       taxExempt: transaction.tax_exempt,
       poNumber: transaction.po,
+      customer: (if is_nil transaction.customer do
+        nil
+      else
+        [
+          type: transaction.customer.type,
+          id: transaction.customer.id,
+          email: transaction.customer.email
+        ]
+      end),
       billTo: (if is_nil transaction.billing_address do
         nil
       else
