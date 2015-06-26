@@ -108,11 +108,27 @@ defmodule AuthorizeNet.Transaction do
     %AuthorizeNet.Transaction{transaction | type: :prior_auth_capture}
   end
 
+  @doc """
+  "VOID" transaction. See:
+  https://support.authorize.net/authkb/index?page=content&id=A510
+  """
   @spec void(
     AuthorizeNet.Transaction.t, String.t
   ) :: AuthorizeNet.Transaction.t
   def void(transaction, transaction_id) do
-    %AuthorizeNet.Transaction{transaction | type: :prior_auth_capture} |>
+    %AuthorizeNet.Transaction{transaction | type: :void} |>
+    ref_transaction_id(transaction_id)
+  end
+
+  @doc """
+  "REFUND" transaction. See:
+  https://support.authorize.net/authkb/index?page=content&id=A510
+  """
+  @spec refund(
+    AuthorizeNet.Transaction.t, String.t
+  ) :: AuthorizeNet.Transaction.t
+  def refund(transaction, transaction_id) do
+    %AuthorizeNet.Transaction{transaction | type: :refund} |>
     ref_transaction_id(transaction_id)
   end
 

@@ -248,10 +248,10 @@ T.bill_to(address) |>
 T.ship_to(address) |>
 T.shipping_cost("ship_cost", "ship_description", 3.44) |>
 T.user_fields(%{"key1": "value1", "key2": "value2"}) |>
-T.order("4455", "pepe") |>
+T.order("4455", "order description") |>
 T.add_item(1, "item1", "itemdesc1", 1, 1.00) |>
 T.add_item(2, "item2", "itemdesc2", 1, 2.00) |>
-T.po_number("popo") |>
+T.po_number("po_number_1") |>
 T.pay_with_customer_profile(35962612, 32510145, 34066235, "900") |>  # or T.pay_with_card(card)
                                                                      # or T.pay_with_apple_pay(data)
 T.customer_ip("127.0.0.1") |>
@@ -274,7 +274,18 @@ T.void("2235759535") |>
 T.run
 ```
 
+### Refund a transaction
+```elixir
+T.new(3.00) |>
+T.bill_to(address) |>
+T.order("4455", "order description") |>
+T.pay_with_card(card) |>
+T.refund("2235759535") |>
+T.run
+```
+
 ----
+
 ## Errors
 
 These errors might be raised by the API calls:
