@@ -144,29 +144,29 @@ Make sure you have an `AuthorizeNet.Address` struct with customer_id and id alre
 
 ## Customer Payment Profiles
 
-Payment profiles can be created with the functions:
+Payment profiles are handled in the [PaymentProfile](https://github.com/marcelog/elixir_authorizenet/blob/master/lib/elixir_authorizenet/payment_profile.ex)
+module. With a PaymentProfile you can declare credit cards and bank accounts and
+save them into a customer profile. Bank accounts are handled by the module [BankAccount](https://github.com/marcelog/elixir_authorizenet/blob/master/lib/elixir_authorizenet/bank_account.ex)
+while credit cards are handled by the module [Card](https://github.com/marcelog/elixir_authorizenet/blob/master/lib/elixir_authorizenet/card.ex)
+
+```elixir
+alias AuthorizeNet.PaymentProfile, as: P
+alias AuthorizeNet.BankAccount, as: BankAccounr
+alias AuthorizeNet.Card, as: Card
+```
+
+And can be created with the functions:
 
  * **AuthorizeNet.PaymentProfile.create_business**: To create a "business" associated payment profile.
  * **AuthorizeNet.PaymentProfile.create_individual**: To create a payment profile for an individual, not associated to a business.
 
-To create a Payment Profile, you first need to create a billing address:
-
-```elixir
-  > address = AuthorizeNet.Address.new "first_name", "last_name", "company", "street", "city", "state", "zip", "country", "phone", "fax"
-  %AuthorizeNet.Address{address: "street", city: "city", company: "company",
-   country: "country", customer_id: nil, fax: "fax", first_name: "first_name",
-   id: nil, last_name: "last_name", phone: "phone", state: "state", zip: "zip"}
-```
-
-Then:
-
 ### Creating a Credit Card
 ```elixir
-  > card = AuthorizeNet.Card.new "5424000000000015", "2015-08", "900"
+  > card = Card.new "5424000000000015", "2015-08", "900"
   %AuthorizeNet.Card{code: "900", expiration_date: "2015-08",
    number: "5424000000000015"}
 
-  > AuthorizeNet.PaymentProfile.create_individual 35962612, address, card
+  > P.create_individual 35962612, address, card
   %AuthorizeNet.PaymentProfile{address: %AuthorizeNet.Address{address: "street",
     city: "city", company: "company", country: "country", customer_id: nil,
     fax: "fax", first_name: "first_name", id: nil, last_name: "last_name",
@@ -183,12 +183,12 @@ Bank accounts can be created via 3 functions:
  * **AuthorizeNet.BankAccount.business_checking**: A business checking account.
 
 ```elixir
-  > account = AuthorizeNet.BankAccount.savings "bank_name", "routing_number", "account_number", "name_on_account", :ccd
+  > account = BankAccount.savings "bank_name", "routing_number", "account_number", "name_on_account", :ccd
   %AuthorizeNet.BankAccount{account_number: "account_number",
    bank_name: "bank_name", echeck_type: :ccd, name_on_account: "name_on_account",
    routing_number: "routing_number", type: :savings}
 
-  > AuthorizeNet.PaymentProfile.create_individual 35962612, address, account
+  > P.create_individual 35962612, address, account
   %AuthorizeNet.PaymentProfile{address: %AuthorizeNet.Address{address: "street",
     city: "city", company: "company", country: "country", customer_id: nil,
     fax: "fax", first_name: "first_name", id: nil, last_name: "last_name",
@@ -203,7 +203,7 @@ The last argument is the type of [echeck](https://www.authorize.net/support/CNP/
 
 ### Getting a payment profile
 ```elixir
-  > AuthorizeNet.PaymentProfile.get 35962612, 32510152
+  > P.get 35962612, 32510152
   %AuthorizeNet.PaymentProfile{address: %AuthorizeNet.Address{address: "street",
     city: "city", company: "company", country: "country", customer_id: nil,
     fax: "fax", first_name: "first_name", id: nil, last_name: "last_name",
@@ -216,11 +216,11 @@ The last argument is the type of [echeck](https://www.authorize.net/support/CNP/
 
 ### Validating
 ```elixir
-  > AuthorizeNet.PaymentProfile.valid? 35962612, 32510145
+  > P.valid? 35962612, 32510145
   {false,
    %AuthorizeNet.Error.Operation{message: [{"E00027", "Card Code is required."}]}}
 
-  > AuthorizeNet.PaymentProfile.valid? 35962612, 32510145, "900"
+  > P.valid? 35962612, 32510145, "900"
   true
 ```
 
