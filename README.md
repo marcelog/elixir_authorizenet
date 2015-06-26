@@ -243,6 +243,20 @@ T.order("4455", "order description") |>
 T.run
 ```
 
+### TransactionResponse
+All transactions will returns a [TransactionResponse](https://github.com/marcelog/elixir_authorizenet/blob/master/lib/elixir_authorizenet/transaction_response.ex)
+struct, like:
+
+```elixir
+%AuthorizeNet.TransactionResponse{account_number: "XXXX0015",
+ account_type: "MasterCard", auth_code: "QWIDX2", avs_result: "Y",
+ cavv_result: nil, code: 1, cvv_result: nil,
+ errors: [{"I00001", "Successful."}], operation_errors: [],
+ ref_transaction_id: nil, success: true, test_request: "0",
+ transaction_hash: "D05A1D1C4558FB329522CCFC62B4A7F3",
+ transaction_id: "2235759738", user_fields: [{"key1", "value1"}, {"key2", "value2"}]}
+```
+
 ### Full Example
 Let's see a crude example of **all** the things you can use and combine
 (be advised that this is a long example but most of the stuff is optional,
@@ -290,15 +304,6 @@ T.pay_with_customer_profile(customer_id, payment_profile_id, shipping_address_id
                                                                                                  # or T.pay_with_bank_account(account)
 T.customer_ip("127.0.0.1") |>
 T.run
-
-%AuthorizeNet.TransactionResponse{account_number: "XXXX0015",
- account_type: "MasterCard", auth_code: "QWIDX2", avs_result: "Y",
- cavv_result: nil, code: 1, cvv_result: nil,
- errors: [{"I00001", "Successful."}], operation_errors: [],
- ref_transaction_id: nil, success: true, test_request: "0",
- transaction_hash: "D05A1D1C4558FB329522CCFC62B4A7F3",
- transaction_id: "2235759738", user_fields: [{"key1", "value1"}, {"key2", "value2"}]}
-
 ```
 
 ### Voiding a transaction
