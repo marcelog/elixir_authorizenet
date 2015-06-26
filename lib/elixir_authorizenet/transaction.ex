@@ -65,8 +65,8 @@ defmodule AuthorizeNet.Transaction do
   @doc """
   Creates a new transaction.
   """
-  @spec new(Float) :: AuthorizeNet.Transaction.t
-  def new(amount) do
+  @spec new(Float | nil) :: AuthorizeNet.Transaction.t
+  def new(amount \\ nil) do
     %AuthorizeNet.Transaction{amount: amount}
   end
 
@@ -106,6 +106,14 @@ defmodule AuthorizeNet.Transaction do
   ) :: AuthorizeNet.Transaction.t
   def prior_auth_capture(transaction) do
     %AuthorizeNet.Transaction{transaction | type: :prior_auth_capture}
+  end
+
+  @spec void(
+    AuthorizeNet.Transaction.t, String.t
+  ) :: AuthorizeNet.Transaction.t
+  def void(transaction, transaction_id) do
+    %AuthorizeNet.Transaction{transaction | type: :prior_auth_capture} |>
+    ref_transaction_id(transaction_id)
   end
 
   @doc """
@@ -629,7 +637,11 @@ defmodule AuthorizeNet.Transaction do
   def to_xml(transaction) do
     [
       transactionType: @transaction_types[transaction.type],
-      amount: to_string(transaction.amount),
+      amount: (if is_nil transaction.amount do
+        nil
+      else
+        to_string(transaction.amount)
+      end),
       payment: (
         case transaction.payment_type do
           :apple_pay -> [
@@ -640,6 +652,7 @@ defmodule AuthorizeNet.Transaction do
           ]
           :card -> Card.to_xml(transaction.card)
           :customer_profile -> nil
+          nil -> nil
         end
       ),
       profile: (if transaction.payment_type !== :customer_profile do

@@ -201,7 +201,7 @@ The last argument is the type of [echeck](https://www.authorize.net/support/CNP/
 ## Making transactions
 
 Let's see a crude example of **all** the things you can use and combine (be advised that this is a long example
-but you only need to use the combinations that suit your needs):
+but most of the stuff is optional, and in the end you only need to use the combinations that suit your needs):
 
 ```elixir
 
@@ -257,6 +257,14 @@ T.pay_with_customer_profile(35962612, 32510145, 34066235, "900") |>  # or T.pay_
 T.customer_ip("127.0.0.1") |>
 T.run
 ```
+
+### Voiding a transaction
+```elixir
+T.new |>
+T.void("2235759535") |>
+T.run
+```
+
 ----
 ## Errors
 
@@ -276,5 +284,6 @@ The source code is released under Apache 2 License.
  * Allow payment profiles when creating a customer profile.
  * Add support for [hosted profile page](http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-get-hosted-profile-page).
  * Add support for [creating a customer profile from a successful transaction](http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-create-a-customer-profile-from-a-transaction).
+ * Add support for [recurring billing](http://developer.authorize.net/api/reference/index.html#recurring-billing).
 
 Check [LICENSE](https://github.com/marcelog/elixir_authorizenet/blob/master/LICENSE) file for more information.
