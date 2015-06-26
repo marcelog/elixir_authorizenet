@@ -264,30 +264,6 @@ struct, like:
  transaction_id: "2235759738", user_fields: [{"key1", "value1"}, {"key2", "value2"}]}
 ```
 
-### Charging transactions
-For transactions, you usually need a credit card, a bank account, a billing address,
-and an optional shipping address.
-
-```elixir
-
-account = AuthorizeNet.BankAccount.savings "bank_name", "routing_number", "12345678", "name_on_account", :ccd
-
-card = AuthorizeNet.Card.new "5424000000000015", "2015-08", "900"
-
-address = AuthorizeNet.Address.new(
-  "first_name",
-  "last_name",
-  "company",
-  "street",
-  "city",
-  "state",
-  "zip",
-  "country",
-  "phone",
-  "fax"
-)
-```
-
 ### Simple credit card transaction
 ```elixir
 T.new(10.25) |>
@@ -343,6 +319,17 @@ T.enable_email_customer |>     # or T.disable_email_customer
 T.run
 ```
 
+### Adding tax information
+Optionally, you can add some tax information:
+```elixir
+T.new(5.00) |>
+T.not_tax_exempt |> # or T.tax_exempt
+T.tax("tax_name", "tax_description", 3.44) |>
+T.duty("duty_name", "duty_description", 3.44) |>
+T.shipping_cost("ship_cost", "ship_description", 3.44) |>
+T.run
+```
+
 ### Full Example
 Let's see a crude example of **all** the things you can use and combine
 (be advised that this is a long example but most of the stuff is optional,
@@ -380,12 +367,8 @@ T.device_website |>          # or T.device_unknown or
                              # or T.device_wireless_pos
                              # or T.device_dial_terminal
                              # or T.device_virtual_terminal
-T.not_tax_exempt |>          # or T.tax_exempt
-T.tax("tax_name", "tax_description", 3.44) |>
-T.duty("duty_name", "duty_description", 3.44) |>
 T.bill_to(address) |>        # Not needed when charging with a customer profile
 T.ship_to(address) |>        # Can be replaced with a shipping address id from a customer profile
-T.shipping_cost("ship_cost", "ship_description", 3.44) |>
 T.user_fields(%{"key1": "value1", "key2": "value2"}) |>
 T.order("4455", "order description") |>
 T.add_item(1, "item1", "itemdesc1", 1, 1.00) |>
