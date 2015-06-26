@@ -206,17 +206,9 @@ The last argument is the type of [echeck](https://www.authorize.net/support/CNP/
 
 ## Making transactions
 
-Let's see a crude example of **all** the things you can use and combine
-(be advised that this is a long example but most of the stuff is optional,
-and in the end you only need to use the combinations that suit your needs). You
-might also want to check the [Transaction](https://github.com/marcelog/elixir_authorizenet/blob/master/lib/elixir_authorizenet/transaction.ex)
-module and the [docs](http://hexdocs.pm/elixir_authorizenet/) at hex.pm.
-
+For transactions, you usually need a credit card, a bank account, a billing address,
+and an optional shipping address.
 ```elixir
-
-# For the sake of simplicity, define an alias for the module, a credit card,
-# a bank account, and an address for shipping.
-alias AuthorizeNet.Transaction, as: T
 account = AuthorizeNet.BankAccount.savings "bank_name", "routing_number", "12345678", "name_on_account", :ccd
 card = AuthorizeNet.Card.new "5424000000000015", "2015-08", "900"
 address = AuthorizeNet.Address.new(
@@ -231,10 +223,35 @@ address = AuthorizeNet.Address.new(
   "phone",
   "fax"
 )
+```
+### Simple credit card transaction
+```elixir
+T.new(10.25) |>
+T.auth_capture() |>
+T.bill_to(address) |>
+T.pay_with_card(card) |>
+T.order("4455", "order description") |>
+T.run
+```
 
-# Now let's see everything that we can set. Again: It's very probable that in
-# your daily use cases you will only need to set a very small number of things.
-T.new(3.00) |>               # Amount is optional and only needed to debit, credit, charge, or refund
+### Paying with a payment profile id
+```elixir
+T.new(10.25) |>
+T.auth_capture() |>
+T.pay_with_customer_profile(customer_profile_id, payment_profile_id, shipping_address_id, card_code) |>
+T.order("4455", "order description") |>
+T.run
+```
+
+### Full Example
+Let's see a crude example of **all** the things you can use and combine
+(be advised that this is a long example but most of the stuff is optional,
+and in the end you only need to use the combinations that suit your needs). You
+might also want to check the [Transaction](https://github.com/marcelog/elixir_authorizenet/blob/master/lib/elixir_authorizenet/transaction.ex)
+module and the [docs](http://hexdocs.pm/elixir_authorizenet/) at hex.pm.
+
+```elixir
+T.new(amount) |>             # Amount is optional and only needed to debit, credit, charge, or refund
 T.auth_code("QFBYYN") |>     # Only needed for previously authorized transactions
 T.auth_capture() |>          # or T.auth_only
                              # or T.capture_only
@@ -268,9 +285,9 @@ T.order("4455", "order description") |>
 T.add_item(1, "item1", "itemdesc1", 1, 1.00) |>
 T.add_item(2, "item2", "itemdesc2", 1, 2.00) |>
 T.po_number("po_number_1") |>
-T.pay_with_customer_profile(35962612, 32510145, 34066235, "900") |>  # or T.pay_with_card(card)
-                                                                     # or T.pay_with_apple_pay(data)
-                                                                     # or T.pay_with_bank_account(account)
+T.pay_with_customer_profile(customer_id, payment_profile_id, shipping_address_id, card_code) |>  # or T.pay_with_card(card)
+                                                                                                 # or T.pay_with_apple_pay(data)
+                                                                                                 # or T.pay_with_bank_account(account)
 T.customer_ip("127.0.0.1") |>
 T.run
 
