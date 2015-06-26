@@ -147,11 +147,11 @@ Make sure you have an `AuthorizeNet.Address` struct with customer_id and id alre
 Payment profiles are handled in the [PaymentProfile](https://github.com/marcelog/elixir_authorizenet/blob/master/lib/elixir_authorizenet/payment_profile.ex)
 module. With a PaymentProfile you can declare credit cards and bank accounts and
 save them into a customer profile. Bank accounts are handled by the module [BankAccount](https://github.com/marcelog/elixir_authorizenet/blob/master/lib/elixir_authorizenet/bank_account.ex)
-while credit cards are handled by the module [Card](https://github.com/marcelog/elixir_authorizenet/blob/master/lib/elixir_authorizenet/card.ex)
+while credit cards are handled by the module [Card](https://github.com/marcelog/elixir_authorizenet/blob/master/lib/elixir_authorizenet/card.ex).
 
 ```elixir
 alias AuthorizeNet.PaymentProfile, as: P
-alias AuthorizeNet.BankAccount, as: BankAccounr
+alias AuthorizeNet.BankAccount, as: BankAccount
 alias AuthorizeNet.Card, as: Card
 ```
 
