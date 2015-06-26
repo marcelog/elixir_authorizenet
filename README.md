@@ -263,6 +263,15 @@ T.run
 T.new |>
 T.void("2235759535") |>
 T.run
+
+%AuthorizeNet.TransactionResponse{account_number: "XXXX0015",
+ account_type: "MasterCard", auth_code: "QWIDX2", avs_result: "Y",
+ cavv_result: nil, code: 1, cvv_result: nil,
+ errors: [{"I00001", "Successful."}], operation_errors: [],
+ ref_transaction_id: nil, success: true, test_request: "0",
+ transaction_hash: "D05A1D1C4558FB329522CCFC62B4A7F3",
+ transaction_id: "2235759738", user_fields: [{"key1", "value1"}, {"key2", "value2"}]}
+
 ```
 
 ----
