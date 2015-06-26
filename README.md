@@ -205,8 +205,9 @@ but most of the stuff is optional, and in the end you only need to use the combi
 
 ```elixir
 
-# For the sake of simplicity, define an alias for the module, a credit card, and an address for shipping.
+# For the sake of simplicity, define an alias for the module, a credit card, a bank account, and an address for shipping.
 alias AuthorizeNet.Transaction, as: T
+account = AuthorizeNet.BankAccount.savings "bank_name", "routing_number", "12345678", "name_on_account", :ccd
 card = AuthorizeNet.Card.new "5424000000000015", "2015-08", "900"
 address = AuthorizeNet.Address.new(
   "first_name",
@@ -223,10 +224,11 @@ address = AuthorizeNet.Address.new(
 
 # Now let's see everything that we can set.
 T.new(3.00) |>
+T.auth_code("QFBYYN") |>     # Only needed for previously authorized transactions
 T.auth_capture() |>          # or T.auth_only
                              # or T.capture_only
                              # or T.prior_auth_capture
-T.ref_transaction_id("0") |>
+T.ref_transaction_id("2235786422") |> # Only needed for refund, void, credit, etc.
 T.enable_partial_auth |>     # or T.disable_partial_auth
 T.enable_duplicate_window |> # or T.disable_duplicate_window
 T.enable_test_request |>     # or T.disable_test_request
@@ -254,6 +256,7 @@ T.add_item(2, "item2", "itemdesc2", 1, 2.00) |>
 T.po_number("po_number_1") |>
 T.pay_with_customer_profile(35962612, 32510145, 34066235, "900") |>  # or T.pay_with_card(card)
                                                                      # or T.pay_with_apple_pay(data)
+                                                                     # or T.pay_with_bank_account(account)
 T.customer_ip("127.0.0.1") |>
 T.run
 

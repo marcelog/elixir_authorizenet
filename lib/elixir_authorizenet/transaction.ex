@@ -18,6 +18,7 @@ defmodule AuthorizeNet.Transaction do
   alias AuthorizeNet, as: Main
   alias AuthorizeNet.TransactionResponse, as: Response
   alias AuthorizeNet.Card, as: Card
+  alias AuthorizeNet.BankAccount, as: BankAccount
   alias AuthorizeNet.Address, as: Address
 
   @settings [
@@ -50,7 +51,9 @@ defmodule AuthorizeNet.Transaction do
     payment_profile_id: nil,
     shipping_address_id: nil,
     card_code: nil,
-    ref_transaction_id: nil
+    ref_transaction_id: nil,
+    bank_account: nil,
+    auth_code: nil
 
   @type t :: Map
   @transaction_types [
@@ -148,6 +151,17 @@ defmodule AuthorizeNet.Transaction do
   end
 
   @doc """
+  Authorization code. This may have been obtained from a verbal authorization
+  or through another channel.
+  """
+  @spec auth_code(
+    AuthorizeNet.Transaction.t, String.t
+  ) :: AuthorizeNet.Transaction.t
+  def auth_code(transaction, code) do
+    %AuthorizeNet.Transaction{transaction | auth_code: code}
+  end
+
+  @doc """
   Adds shipping information.
   """
   @spec ship_to(
@@ -216,6 +230,19 @@ defmodule AuthorizeNet.Transaction do
     %AuthorizeNet.Transaction{transaction |
       payment_type: :card,
       card: card
+    }
+  end
+
+  @doc """
+  Pays this transaction with a bank account.
+  """
+  @spec pay_with_bank_account(
+    AuthorizeNet.Transaction.t, AuthorizeNet.BankAccount
+  ) :: AuthorizeNet.Transaction.t
+  def pay_with_bank_account(transaction, account) do
+    %AuthorizeNet.Transaction{transaction |
+      payment_type: :bank_account,
+      bank_account: account
     }
   end
 
@@ -666,7 +693,8 @@ defmodule AuthorizeNet.Transaction do
               dataValue: transaction.opaque_data_value
             ]
           ]
-          :card -> Card.to_xml(transaction.card)
+          :card -> Card.to_xml transaction.card
+          :bank_account -> BankAccount.to_xml transaction.bank_account
           :customer_profile -> nil
           nil -> nil
         end
@@ -683,6 +711,7 @@ defmodule AuthorizeNet.Transaction do
           shippingProfileId: transaction.shipping_address_id
         ]
       end),
+      authCode: transaction.auth_code,
       refTransId: transaction.ref_transaction_id,
       order: (if is_nil transaction.order do
         nil
