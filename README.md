@@ -23,6 +23,19 @@ Then run mix deps.get to install it.
 
 ----
 
+# Configuring
+In your config.exs, setup the following section:
+
+```elixir
+config :authorize_net,
+  environment: :sandbox,  # :sandbox or :production
+  validation_mode: :test, # :test, :live, or :none
+  login_id: "login_id",
+  transaction_key: "transaction_key"
+```
+
+----
+
 # Documentation
 
 What follows is just a glance, a quick overview of the common used features.
