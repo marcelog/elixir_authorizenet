@@ -23,7 +23,7 @@ defmodule AuthorizeNet do
   require Logger
 
   @uris sandbox: "https://apitest.authorize.net/xml/v1/request.api",
-    production: "https://api.authorize.net/xml/v1/request.api"
+    production: "https://api2.authorize.net/xml/v1/request.api"
 
   @doc """
   Makes a request to the Authorize.Net API. Adds authentication and parses
