@@ -27,7 +27,7 @@ Then run mix deps.get to install it.
 In your config.exs, setup the following section:
 
 ```elixir
-config :authorize_net,
+config :elixir_authorizenet,
   environment: :sandbox,  # :sandbox or :production
   validation_mode: :test, # :test, :live, or :none
   login_id: "login_id",

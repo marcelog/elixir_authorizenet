@@ -1,6 +1,6 @@
 use Mix.Config
 
-config :authorize_net,
+config :elixir_authorizenet,
   environment: :sandbox,
   validation_mode: :none, # :test, :live, or :none
   login_id: "login_id",

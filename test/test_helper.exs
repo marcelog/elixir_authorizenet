@@ -53,7 +53,7 @@ defmodule AuthorizeNet.Test.Util do
       end
 
       defp set_config(key, value) do
-        Application.put_env :authorize_net, key, value
+        Application.put_env :elixir_authorizenet, key, value
       end
 
       defp set_test_uri() do

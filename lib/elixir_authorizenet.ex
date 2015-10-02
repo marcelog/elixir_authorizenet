@@ -92,6 +92,6 @@ defmodule AuthorizeNet do
   end
 
   defp config(key) do
-    Application.get_env :authorize_net, key
+    Application.get_env :elixir_authorizenet, key
   end
 end

@@ -7,7 +7,7 @@ defmodule AuthorizeNet.Mixfile do
       name: "elixir_authorizenet",
       source_url: "https://github.com/marcelog/elixir_authorizenet",
       version: "0.1.1",
-      elixir: "> 1.0.0",
+      elixir: ">= 1.0.0",
       description: description,
       package: package,
       deps: deps
@@ -39,7 +39,7 @@ Find the user guide in the github repo at: https://github.com/marcelog/elixir_au
   defp package do
     [
       files: ["lib", "priv", "mix.exs", "README*", "LICENSE*"],
-      contributors: ["Marcelo Gornstein"],
+      maintainers: ["Marcelo Gornstein"],
       licenses: ["Apache 2.0"],
       links: %{
         "GitHub" => "https://github.com/marcelog/elixir_authorizenet"
@@ -49,10 +49,10 @@ Find the user guide in the github repo at: https://github.com/marcelog/elixir_au
 
   defp deps do
     [
-      {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.0"},
+      {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.2"},
       {:earmark, "~> 0.1", only: :dev},
       {:ex_doc, "~> 0.7", only: :dev},
-      {:coverex, "~> 1.2.0", only: :test},
+      {:coverex, "~> 1.4.1", only: :test},
       {:exmerl, "~> 0.1.1"},
       {:xml_builder, "~> 0.0.6"},
       {:servito, github: "marcelog/servito", only: :test}
