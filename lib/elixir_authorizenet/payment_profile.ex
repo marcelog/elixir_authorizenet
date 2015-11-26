@@ -43,7 +43,7 @@ defmodule AuthorizeNet.PaymentProfile do
   @spec valid?(Integer, Integer, String.t | nil) :: true | {false, term}
   def valid?(customer_id, profile_id, card_code \\ nil) do
     try do
-      doc = Main.req :validateCustomerPaymentProfileRequest, [
+      Main.req :validateCustomerPaymentProfileRequest, [
         customerProfileId: customer_id,
         customerPaymentProfileId: profile_id,
         cardCode: card_code,
@@ -59,11 +59,15 @@ defmodule AuthorizeNet.PaymentProfile do
   Returns a Payment Profile. See:
   http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-get-customer-payment-profile
   """
-  @spec get(Integer, Integer) :: AuthorizeNet.PaymentProfile.t | no_return
-  def get(customer_id, profile_id) do
+  @spec get(
+    Integer, Integer, Keyword.t
+  ) :: AuthorizeNet.PaymentProfile.t | no_return
+  def get(customer_id, profile_id, options \\ []) do
+    unmask_expiration_date = Enum.member? options, :unmask_expiration_date
     doc = Main.req :getCustomerPaymentProfileRequest, [
       customerProfileId: customer_id,
-      customerPaymentProfileId: profile_id
+      customerPaymentProfileId: profile_id,
+      unmaskExpirationDate: unmask_expiration_date
     ]
     from_xml doc, customer_id
   end

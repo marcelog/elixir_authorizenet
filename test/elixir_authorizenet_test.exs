@@ -419,6 +419,36 @@ defmodule AuthorizeNetTest do
       end
   end
 
+  test "can get payment profile with options" do
+    address = AuthorizeNet.Address.new(
+      "first", "last", "company", "street", "city",
+      "state", "zip", "country", "phone", "fax"
+    )
+    card = AuthorizeNet.Card.new "XXXX0015", "XXXX", nil
+
+    request_assert "get_payment_profile", "getCustomerPaymentProfileRequest",
+      fn() ->
+        AuthorizeNet.PaymentProfile.get(
+          35947873, 32510145, [:unmask_expiration_date]
+        )
+      end,
+      fn(body, msgs) ->
+        assert_fields body, msgs, [
+          {"customerProfileId", "35947873"},
+          {"customerPaymentProfileId", "32510145"}
+        ]
+      end,
+      fn(result) ->
+        assert %AuthorizeNet.PaymentProfile{
+          profile_id: 32510145,
+          customer_id: 35947873,
+          address: address,
+          type: :individual,
+          payment_type: card
+        } === result
+      end
+  end
+
   test "can validate payment profile" do
     request_assert "valid_payment_profile", "validateCustomerPaymentProfileRequest",
       fn() -> AuthorizeNet.PaymentProfile.valid? 35947873, 32500939, 900 end,

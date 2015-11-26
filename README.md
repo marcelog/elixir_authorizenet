@@ -227,6 +227,17 @@ The last argument is the type of [echeck](https://www.authorize.net/support/CNP/
    type: :individual}
 ```
 
+There is a third argument available which is a list of options. The available
+options are:
+
+ * **:unmask_expiration_date**: For payment profiles associated to credit cards,
+ this will return the expiration date unmasked.
+
+Example:
+```elixir
+  > P.get 35962612, 34818508, [:unmask_expiration_date]
+```
+
 ### Validating
 ```elixir
   > P.valid? 35962612, 32510145
