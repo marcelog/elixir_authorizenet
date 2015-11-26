@@ -238,6 +238,21 @@ Example:
   > P.get 35962612, 34818508, [:unmask_expiration_date]
 ```
 
+### Searching for payment profiles
+This will return all the payment profiles of all customers that matches the
+given criteria. For more information about the values allowed see:
+[http://developer.authorize.net/api/reference/#customer-profiles-get-customer-payment-profile-list](http://developer.authorize.net/api/reference/#customer-profiles-get-customer-payment-profile-list).
+
+```elixir
+  > P.get_list "cardsExpiringInMonth", "2016-08", "id", false, 100, 1
+  [%AuthorizeNet.PaymentProfile{address: %AuthorizeNet.Address{address: "street",
+   city: "city", company: "company", country: "country", customer_id: 38311592,
+   fax: "fax", first_name: "first_name", id: nil, last_name: "last_name",
+   phone: "phone", state: "state", zip: "zip"}, customer_id: 38311592,
+   payment_type: %AuthorizeNet.Card{code: nil, expiration_date: "XXXX",
+   number: "XXXX0015"}, profile_id: 34818508, type: nil}]
+```
+
 ### Validating
 ```elixir
   > P.valid? 35962612, 32510145

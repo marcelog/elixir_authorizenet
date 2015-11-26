@@ -73,6 +73,33 @@ defmodule AuthorizeNet.PaymentProfile do
   end
 
   @doc """
+  Returns all payment profiles matching the given criteria. See:
+  http://developer.authorize.net/api/reference/#customer-profiles-get-customer-payment-profile-list
+  """
+  @spec get_list(
+    String.t, String.t, String.t, boolean, Integer, Integer
+  ) :: [AuthorizeNet.PaymentProfile.t] | no_return
+  def get_list(search_type, month, order_by, order_desc, limit, offset) do
+    doc = Main.req :getCustomerPaymentProfileListRequest, [
+      searchType: search_type,
+      month: month,
+      sorting: [
+        orderBy: order_by,
+        orderDescending: to_string(order_desc)
+      ],
+      paging: [
+        limit: limit,
+        offset: offset
+      ]
+    ]
+    profiles = xml_find doc, "//paymentProfile"
+    for p <- profiles do
+      customer_id = xml_one_value_int p, "//customerProfileId"
+      from_xml p, customer_id
+    end
+  end
+
+  @doc """
   Deletes a Payment Profile. See:
   http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-delete-customer-payment-profile
   """
@@ -174,7 +201,7 @@ defmodule AuthorizeNet.PaymentProfile do
     end
     address = case xml_find doc, "//billTo" do
       [] -> nil
-      _ -> Address.from_xml doc
+      _ -> Address.from_xml doc, customer_id
     end
     id = xml_one_value_int doc, "//customerPaymentProfileId"
     new(

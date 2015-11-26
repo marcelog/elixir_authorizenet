@@ -398,6 +398,7 @@ defmodule AuthorizeNetTest do
       "first", "last", "company", "street", "city",
       "state", "zip", "country", "phone", "fax"
     )
+    address = %AuthorizeNet.Address{address | customer_id: 35947873}
     card = AuthorizeNet.Card.new "XXXX0015", "XXXX", nil
 
     request_assert "get_payment_profile", "getCustomerPaymentProfileRequest",
@@ -424,6 +425,7 @@ defmodule AuthorizeNetTest do
       "first", "last", "company", "street", "city",
       "state", "zip", "country", "phone", "fax"
     )
+    address = %AuthorizeNet.Address{address | customer_id: 35947873}
     card = AuthorizeNet.Card.new "XXXX0015", "XXXX", nil
 
     request_assert "get_payment_profile", "getCustomerPaymentProfileRequest",
@@ -446,6 +448,37 @@ defmodule AuthorizeNetTest do
           type: :individual,
           payment_type: card
         } === result
+      end
+  end
+
+  test "can get payment profile list" do
+    address = AuthorizeNet.Address.new(
+      "first_name", "last_name", "company", "street", "city",
+      "state", "zip", "country", "phone", "fax"
+    )
+    address = %AuthorizeNet.Address{address | customer_id: 38311592}
+    card = AuthorizeNet.Card.new "XXXX0015", "XXXX", nil
+
+    request_assert "get_payment_profile_list", "getCustomerPaymentProfileListRequest",
+      fn() ->
+        AuthorizeNet.PaymentProfile.get_list(
+          "cardsExpiringInMonth", "2016-08", "id", false, 100, 1
+        )
+      end,
+      fn(body, msgs) ->
+        assert_fields body, msgs, [
+          {"searchType", "cardsExpiringInMonth"},
+          {"month", "2016-08"}
+        ]
+      end,
+      fn(result) ->
+        assert [%AuthorizeNet.PaymentProfile{
+          profile_id: 34818508,
+          customer_id: 38311592,
+          address: address,
+          type: :nil,
+          payment_type: card
+        }] === result
       end
   end
 
