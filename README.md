@@ -95,7 +95,7 @@ alias AuthorizeNet.Customer, as: C
 To handle billing and shipping addresses, use the [Address](https://github.com/marcelog/elixir_authorizenet/blob/master/lib/elixir_authorizenet/address.ex)
 module.
 ```elixir
-alias AuthorizeNet.Addresses, as: A
+alias AuthorizeNet.Address, as: A
 
 address = A.new(
   "first_name",
