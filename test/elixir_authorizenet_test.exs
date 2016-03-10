@@ -745,23 +745,23 @@ defmodule AuthorizeNetTest do
         [s1, s2, s3, s4, s5] = xml_find body, "//setting"
         assert_fields(s1, msgs, [
           {"settingName", "allowPartialAuth"},
-          {"settingValue", "false"}
+          {"settingValue", "0"}
         ])
         assert_fields(s2, msgs, [
           {"settingName", "duplicateWindow"},
-          {"settingValue", "false"}
+          {"settingValue", "0"}
         ])
         assert_fields(s3, msgs, [
           {"settingName", "emailCustomer"},
-          {"settingValue", "false"}
+          {"settingValue", "0"}
         ])
         assert_fields(s4, msgs, [
           {"settingName", "recurringBilling"},
-          {"settingValue", "false"}
+          {"settingValue", "0"}
         ])
         assert_fields(s5, msgs, [
           {"settingName", "testRequest"},
-          {"settingValue", "false"}
+          {"settingValue", "0"}
         ])
       end,
       fn(_result) -> true end
@@ -784,23 +784,23 @@ defmodule AuthorizeNetTest do
         [s1, s2, s3, s4, s5] = xml_find body, "//setting"
         assert_fields(s1, msgs, [
           {"settingName", "allowPartialAuth"},
-          {"settingValue", "true"}
+          {"settingValue", "1"}
         ])
         assert_fields(s2, msgs, [
           {"settingName", "duplicateWindow"},
-          {"settingValue", "true"}
+          {"settingValue", "1"}
         ])
         assert_fields(s3, msgs, [
           {"settingName", "emailCustomer"},
-          {"settingValue", "true"}
+          {"settingValue", "1"}
         ])
         assert_fields(s4, msgs, [
           {"settingName", "recurringBilling"},
-          {"settingValue", "true"}
+          {"settingValue", "1"}
         ])
         assert_fields(s5, msgs, [
           {"settingName", "testRequest"},
-          {"settingValue", "true"}
+          {"settingValue", "1"}
         ])
       end,
       fn(_result) -> true end

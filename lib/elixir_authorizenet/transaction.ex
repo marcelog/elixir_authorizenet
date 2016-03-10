@@ -833,11 +833,11 @@ defmodule AuthorizeNet.Transaction do
   end
 
   defp enable_setting(transaction, key) do
-    set_setting transaction, key, true
+    set_setting transaction, key, 1
   end
 
   defp disable_setting(transaction, key) do
-    set_setting transaction, key, false
+    set_setting transaction, key, 0
   end
 
   defp set_setting(transaction, key, value) do
