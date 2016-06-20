@@ -33,8 +33,8 @@ defmodule AuthorizeNet.TransactionResponse do
     operation_errors: []
 
   def new(doc) do
-    success = xml_one_value(doc, "//resultCode") !== "Error"
     code = xml_one_value_int doc, "//responseCode"
+    success = (xml_one_value(doc, "//resultCode") !== "Error") and (code === 1)
     codes = xml_value doc, "//code"
     texts = xml_value doc, "//text"
     user_fields = case xml_find doc, "//userField" do
