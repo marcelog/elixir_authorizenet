@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/marcelog/elixir_authorizenet.svg)](https://travis-ci.org/marcelog/elixir_authorizenet)
+[![Deps Status](https://beta.hexfaktor.org/badge/all/github/marcelog/elixir_authorizenet.svg)](https://beta.hexfaktor.org/github/marcelog/elixir_authorizenet)
 
 # elixir_authorizenet
 
