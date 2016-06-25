@@ -17,7 +17,7 @@ To use it in your Mix projects, first add it as a dependency:
 
 ```elixir
 def deps do
-  [{:elixir_authorizenet, "~> 0.2.2"}]
+  [{:elixir_authorizenet, "~> 0.3.0"}]
 end
 ```
 Then run mix deps.get to install it.
