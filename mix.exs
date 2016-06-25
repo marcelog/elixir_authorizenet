@@ -49,13 +49,13 @@ Find the user guide in the github repo at: https://github.com/marcelog/elixir_au
 
   defp deps do
     [
-      {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.2"},
-      {:earmark, "~> 0.1", only: :dev},
-      {:ex_doc, "~> 0.7", only: :dev},
-      {:coverex, "~> 1.4.1", only: :test},
+      {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.3"},
+      {:earmark, "~> 0.2.1", only: :dev},
+      {:ex_doc, "~> 0.12.0", only: :dev},
+      {:coverex, "~> 1.4.9", only: :test},
       {:exmerl, "~> 0.1.1"},
-      {:xml_builder, "~> 0.0.6"},
-      {:servito, github: "marcelog/servito", only: :test}
+      {:xml_builder, "~> 0.0.8"},
+      {:servito, github: "marcelog/servito", only: :test, tag: "v0.0.4"}
     ]
   end
 end
