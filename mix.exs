@@ -53,9 +53,9 @@ Find the user guide in the github repo at: https://github.com/marcelog/elixir_au
       {:earmark, "~> 0.2.1", only: :dev},
       {:ex_doc, "~> 0.12.0", only: :dev},
       {:coverex, "~> 1.4.9", only: :test},
-      {:exmerl, "~> 0.1.1"},
+      {:exmerl, github: "pwoolcoc/exmerl", ref: "26ce73d6694d21208ffbaa1e87abd9c5407a0409"},
       {:xml_builder, "~> 0.0.8"},
-      {:servito, github: "marcelog/servito", only: :test, tag: "v0.0.4"}
+      {:servito, github: "marcelog/servito", only: :test, tag: "v0.0.5"}
     ]
   end
 end
