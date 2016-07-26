@@ -60,7 +60,9 @@ defmodule AuthorizeNet.Helper.XML do
     quote [location: :keep] do
       case xml_find unquote(doc), "#{unquote(element)}/text()" do
         [] -> nil
-        [e] -> to_string xmlText(e, :value)
+        elements ->
+          strings = for e <- elements, do: to_string xmlText(e, :value)
+          Enum.join strings, ""
       end
     end
   end
