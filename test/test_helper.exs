@@ -66,7 +66,7 @@ defmodule AuthorizeNet.Test.Util do
       end
 
       defp start_server(fun) do
-        {path, uri, port} = set_test_uri
+        {path, uri, port} = set_test_uri()
         name = String.to_atom(
           :base64.encode :erlang.term_to_binary(:erlang.make_ref)
         )

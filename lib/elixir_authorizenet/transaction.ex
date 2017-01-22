@@ -21,11 +21,6 @@ defmodule AuthorizeNet.Transaction do
   alias AuthorizeNet.BankAccount, as: BankAccount
   alias AuthorizeNet.Address, as: Address
 
-  @settings [
-    partial_auth: "allowPartialAuth",
-    duplicate_window: "duplicateWindow",
-    email_customer: "emailCustomer"
-  ]
   defstruct settings: %{},
     user_fields: %{},
     tax: nil,

@@ -39,9 +39,9 @@ defmodule AuthorizeNet do
     body = [{
       requestType,
       %{xmlns: "AnetApi/xml/v1/schema/AnetApiSchema.xsd"},
-      [{:merchantAuthentication, auth}|parameters]
+      [{:merchantAuthentication, auth()}|parameters]
     }]
-    case Http.req :post, uri, body do
+    case Http.req :post, uri(), body do
       {:ok, 200, _headers, <<0xEF, 0xBB, 0xBF, body :: binary>>} ->
         {doc, _} = Exmerl.from_string body
         [result] = xml_value doc, "//messages/resultCode"
@@ -72,7 +72,7 @@ defmodule AuthorizeNet do
   end
 
   defp auth() do
-    [name: login_id, transactionKey: transaction_key]
+    [name: login_id(), transactionKey: transaction_key()]
   end
 
   defp login_id() do

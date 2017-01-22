@@ -1034,7 +1034,7 @@ defmodule AuthorizeNetTest do
   defp request_assert(
     file, request_type, request_fun, server_asserts_fun, client_asserts_fun
   ) do
-    me = self
+    me = self()
     server_name = start_server fn(_bindings, _headers, body, req, state) ->
       msgs = []
       msgs = case validate body do
