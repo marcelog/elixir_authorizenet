@@ -43,7 +43,7 @@ defmodule AuthorizeNet do
     }]
     case Http.req :post, uri(), body do
       {:ok, 200, _headers, <<0xEF, 0xBB, 0xBF, body :: binary>>} ->
-        {doc, _} = Exmerl.from_string body
+        doc = SweetXml.parse body
         [result] = xml_value doc, "//messages/resultCode"
         if result === "Error" do
           codes = xml_value doc, "//code"

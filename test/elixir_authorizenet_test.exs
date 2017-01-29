@@ -47,7 +47,7 @@ defmodule AuthorizeNetTest do
     request_assert "customer_profiles_get_all", "getCustomerProfileIdsRequest",
       fn() -> AuthorizeNet.Customer.get_all end,
       fn(body, msgs) ->
-        msgs = if xml_find(body, "//merchantAuthentication") === [] do
+        msgs = if xml_find(body, ~x"//merchantAuthentication"l) === [] do
           ["missing auth section"|msgs]
         else
           msgs
@@ -742,7 +742,7 @@ defmodule AuthorizeNetTest do
         T.run
       end,
       fn(body, msgs) ->
-        [s1, s2, s3, s4, s5] = xml_find body, "//setting"
+        [s1, s2, s3, s4, s5] = xml_find body, ~x"//setting"l
         assert_fields(s1, msgs, [
           {"settingName", "allowPartialAuth"},
           {"settingValue", "0"}
@@ -781,7 +781,7 @@ defmodule AuthorizeNetTest do
         T.run
       end,
       fn(body, msgs) ->
-        [s1, s2, s3, s4, s5] = xml_find body, "//setting"
+        [s1, s2, s3, s4, s5] = xml_find body, ~x"//setting"l
         assert_fields(s1, msgs, [
           {"settingName", "allowPartialAuth"},
           {"settingValue", "1"}
@@ -816,7 +816,7 @@ defmodule AuthorizeNetTest do
         T.run
       end,
       fn(body, msgs) ->
-        [o_data] = xml_find body, "//opaqueData"
+        [o_data] = xml_find body, ~x"//opaqueData"l
         assert_fields(o_data, msgs, [
           {"dataDescriptor", "COMMON.APPLE.INAPP.PAYMENT"},
           {"dataValue", "443331"}
@@ -836,7 +836,7 @@ defmodule AuthorizeNetTest do
         T.run
       end,
       fn(body, msgs) ->
-        [card] = xml_find body, "//creditCard"
+        [card] = xml_find body, ~x"//creditCard"l
         assert_fields(card, msgs, [
           {"cardNumber", "5424000000000015"},
           {"expirationDate", "2015-08"},
@@ -860,7 +860,7 @@ defmodule AuthorizeNetTest do
         T.run
       end,
       fn(body, msgs) ->
-        [acc] = xml_find body, "//bankAccount"
+        [acc] = xml_find body, ~x"//bankAccount"l
         assert_fields(acc, msgs, [
           {"bankName", "bank_name"},
           {"echeckType", "CCD"},
@@ -913,16 +913,16 @@ defmodule AuthorizeNetTest do
         T.run
       end,
       fn(body, msgs) ->
-        [profile] = xml_find body, "//profile"
-        [order] = xml_find body, "//order"
-        [f1, f2] = xml_find body, "//userField"
-        [ship_to] = xml_find body, "//shipTo"
-        [bill_to] = xml_find body, "//billTo"
-        [i1, i2] = xml_find body, "//lineItem"
-        [tax] = xml_find body, "//tax"
-        [duty] = xml_find body, "//duty"
-        [shipping] = xml_find body, "//shipping"
-        [customer] = xml_find body, "//customer"
+        [profile] = xml_find body, ~x"//profile"l
+        [order] = xml_find body, ~x"//order"l
+        [f1, f2] = xml_find body, ~x"//userField"l
+        [ship_to] = xml_find body, ~x"//shipTo"l
+        [bill_to] = xml_find body, ~x"//billTo"l
+        [i1, i2] = xml_find body, ~x"//lineItem"l
+        [tax] = xml_find body, ~x"//tax"l
+        [duty] = xml_find body, ~x"//duty"l
+        [shipping] = xml_find body, ~x"//shipping"l
+        [customer] = xml_find body, ~x"//customer"l
         assert "3.01" === hd(xml_value body, "//amount")
         msgs = assert_fields(body, msgs, [
           {"marketType", "2"},
@@ -1041,7 +1041,7 @@ defmodule AuthorizeNetTest do
         {:error, error} -> ["invalid schema: #{inspect error}"|msgs]
         :ok -> msgs
       end
-      msgs = if xml_find(body, "//#{request_type}") === [] do
+      msgs = if xml_find(body, ~x"//#{request_type}"l) === [] do
         ["missing request section"|msgs]
       else
         msgs

@@ -92,7 +92,7 @@ defmodule AuthorizeNet.PaymentProfile do
         offset: offset
       ]
     ]
-    profiles = xml_find doc, "//paymentProfile"
+    profiles = xml_find doc, ~x"//paymentProfile"l
     for p <- profiles do
       customer_id = xml_one_value_int p, "//customerProfileId"
       from_xml p, customer_id
@@ -195,11 +195,11 @@ defmodule AuthorizeNet.PaymentProfile do
         end
         type
     end
-    payment = case xml_find doc, "//creditCard" do
+    payment = case xml_find doc, ~x"//creditCard"l do
       [] -> BankAccount.from_xml doc
       _ -> Card.from_xml doc
     end
-    address = case xml_find doc, "//billTo" do
+    address = case xml_find doc, ~x"//billTo"l do
       [] -> nil
       _ -> Address.from_xml doc, customer_id
     end

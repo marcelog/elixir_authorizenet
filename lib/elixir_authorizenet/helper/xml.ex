@@ -21,48 +21,36 @@ defmodule AuthorizeNet.Helper.XML do
       import AuthorizeNet.Helper.XML
       require Record
       require Logger
-      Record.defrecord(
-        :xmlText,
-        Record.extract(:xmlText, from_lib: "xmerl/include/xmerl.hrl")
-      )
-      Record.defrecord(
-        :xmlElement,
-        Record.extract(:xmlElement, from_lib: "xmerl/include/xmerl.hrl")
-      )
+      import SweetXml
     end
   end
 
   defmacro xml_find(doc, xpath) do
     quote [location: :keep] do
-      Exmerl.XPath.find unquote(doc), unquote(xpath)
+      SweetXml.xpath unquote(doc), unquote(xpath)
     end
   end
 
   defmacro xml_value(doc, element) do
     quote [location: :keep] do
-      elements = xml_find unquote(doc), "#{unquote(element)}/text()"
-      for e <- elements, do: to_string xmlText(e, :value)
+      SweetXml.xpath unquote(doc), ~x"#{unquote(element)}/text()"ls
     end
   end
 
   defmacro xml_one_value_int(doc, element) do
     quote [location: :keep] do
-      case xml_one_value(unquote(doc), unquote(element)) do
-        nil -> nil
-        code ->
-          {code, ""} = Integer.parse code
-          code
+      case SweetXml.xpath unquote(doc), ~x"#{unquote(element)}/text()"I do
+        0 -> nil
+        i -> i
       end
     end
   end
 
   defmacro xml_one_value(doc, element) do
     quote [location: :keep] do
-      case xml_find unquote(doc), "#{unquote(element)}/text()" do
+      case SweetXml.xpath unquote(doc), ~x"#{unquote(element)}/text()"ls do
         [] -> nil
-        elements ->
-          strings = for e <- elements, do: to_string xmlText(e, :value)
-          Enum.join strings, ""
+        elements -> Enum.join elements, ""
       end
     end
   end

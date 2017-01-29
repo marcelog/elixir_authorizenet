@@ -37,7 +37,7 @@ defmodule AuthorizeNet.TransactionResponse do
     success = (xml_one_value(doc, "//resultCode") !== "Error") and (code === 1)
     codes = xml_value doc, "//code"
     texts = xml_value doc, "//text"
-    user_fields = case xml_find doc, "//userField" do
+    user_fields = case xml_find doc, ~x"//userField"l do
       [] -> []
       user_fields -> for f <- user_fields do
         {xml_one_value(f, "//name"), xml_one_value(f, "//value")}
