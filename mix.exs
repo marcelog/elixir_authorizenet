@@ -47,13 +47,13 @@ User guide at: https://github.com/marcelog/elixir_authorizenet.
 
   defp deps do
     [
-      {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.3"},
+      {:ibrowse, "~> 4.4.0"},
       {:earmark, "~> 1.0.3", only: :dev},
       {:ex_doc, "~> 0.14.5", only: :dev},
       {:coverex, "~> 1.4.12", only: :test},
-      {:exmerl, github: "portatext/exmerl", branch: "fixing_warnings_elixir_1_4_0"},
+      {:sweet_xml, "~> 0.6.4"},
       {:xml_builder, "~> 0.0.9"},
-      {:servito, github: "marcelog/servito", only: :test, tag: "v0.0.10"}
+      {:servito, "~> 0.0.10", only: :test}
     ]
   end
 end
