@@ -7,7 +7,7 @@ defmodule AuthorizeNet.Mixfile do
       name: "elixir_authorizenet",
       source_url: "https://github.com/marcelog/elixir_authorizenet",
       version: "0.4.0",
-      elixir: ">= 1.0.0",
+      elixir: ">= 1.1.0",
       description: description(),
       package: package(),
       deps: deps()
