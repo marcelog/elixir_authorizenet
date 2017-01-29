@@ -184,10 +184,10 @@ defmodule AuthorizeNet.Customer do
   @spec from_xml(Record) :: AuthorizeNet.Customer.t
   def from_xml(doc) do
     profile_id = xml_one_value_int doc, "//customerProfileId"
-    payment_profiles = for p <- xml_find(doc, ~x"//paymentProfiles"ls) do
+    payment_profiles = for p <- xml_find(doc, ~x"//paymentProfiles"l) do
       PaymentProfile.from_xml p, profile_id
     end
-    shipping_addresses = for a <- xml_find(doc, ~x"//shipToList"ls) do
+    shipping_addresses = for a <- xml_find(doc, ~x"//shipToList"l) do
       Address.from_xml a, profile_id
     end
     new(
